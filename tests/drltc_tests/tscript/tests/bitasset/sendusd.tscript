@@ -1,0 +1,35 @@
+[
+ ["!clients", ["blockmaker", "angel", "alice", "bob"]],
+ ["x", "all", "debug_start_simulated_time", ["${genesis.timestamp}"]],
+ ["x", "all", "wallet_create", ["${client.name}", "password"]],
+ ["x", "all", "wallet_open", ["${client.name}", "password"]],
+ ["x", "all", "wallet_unlock", [999999, "password"]],
+ ["x", "all", "wallet_set_automatic_backups", [false]],
+ ["x", "blockmaker", "debug_deterministic_private_keys", [0, 101, "init", true]],
+ ["x", "blockmaker", "wallet_delegate_set_block_production", ["ALL", true]],
+
+ ["x", "all", "debug_advance_time", [1, "seconds"]],
+ ["x", "all", "debug_advance_time", [1, "blocks"]],
+ ["x", "all", "debug_wait_for_block_by_number", [1, "rlast"]],
+
+ ["x", ["angel", "alice", "bob"], "debug_deterministic_private_keys", [0, 1, "${client.name}", true, "${client.name}", true, true]],
+
+ ["x", "all", "debug_advance_time", [1, "blocks"]],
+ ["x", "all", "debug_wait_for_block_by_number", [1, "rlast"]],
+
+ ["x", "blockmaker", "wallet_publish_feeds_multi_experimental", [[["USD", 500000]]]],
+ ["x", "all", "debug_advance_time", [1, "blocks"]],
+ ["x", "all", "debug_wait_for_block_by_number", [1, "rlast"]],
+
+ ["x", "alice", "blockchain_get_feeds_for_asset", ["USD"]],
+ ["x", "alice", "blockchain_list_feed_prices"],
+
+ ["x", "bob", "wallet_market_submit_short", ["${client.name}", "5000.0", "XTS", "0.0", "USD", 0]],
+ ["x", "alice", "wallet_market_submit_ask", ["${client.name}", "5000.0", "XTS", "0.02", "USD"]],
+
+ ["x", "all", "debug_advance_time", [1, "blocks"]],
+ ["x", "all", "debug_wait_for_block_by_number", [1, "rlast"]],
+
+ ["x", ["angel", "alice", "bob"], "wallet_account_balance"]
+ 
+]
