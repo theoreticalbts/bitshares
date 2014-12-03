@@ -54,7 +54,6 @@ tests/client_rpc_tests/client_rpc_tests
 tests/deterministic_signature_test
 tests/dev_tests
 tests/nathan_tests
-tests/drltc_tests
 tests/nikolai
 tests/server_node
 tests/wallet_tests
