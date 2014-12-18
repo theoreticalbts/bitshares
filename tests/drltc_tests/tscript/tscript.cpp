@@ -22,6 +22,7 @@
 
 #include <bts/blockchain/genesis_config.hpp>
 #include <bts/cli/cli.hpp>
+#include <bts/cli/print_result.hpp>
 #include <bts/client/client.hpp>
 #include <bts/net/node.hpp>
 #include <bts/rpc/rpc_server.hpp>
@@ -94,6 +95,7 @@ public:
     void interact();
     
     context_ptr ctx;
+    bts::cli::print_result printer;
 };
 
 inline bool startswith(
@@ -551,17 +553,34 @@ void interpreter::cmd_x(const fc::variants& cmd)
             fc::optional<fc::variant> result;
             fc::optional<fc::exception> exc;
             
+            std::cout << "{\n";
             try
             {
                 result = t->client->get_rpc_server()->direct_invoke_method(method_name, args);
-                std::cout << "      result:" << fc::json::to_string(result) << "\n";
+                fc::string json_result = fc::json::to_string(result);
+                std::stringstream ss_print;
+                this->printer.format_and_print( method_name, args, result, t->client.get(), ss_print );
+                std::string printed_result = ss_print.str();
+                // TODO:  Escape printed_result
+                std::cout << "  result : " << json_result << ",\n"
+                             "  printed_result : \"\"\"\n" << printed_result << "\n\"\"\",\n"
+                             "  exception : null\n";
             }
             catch( const fc::exception& e )
             {
                 exc = e;
-                std::cout << "      " << e.to_detail_string() << "\n";
+                std::cout << "  result : null,\n"
+                             "  printed_result : \"\"\n"
+                             "  exception : {\n"
+                             "    name : \"" << e.name() << "\",\n"
+                             "    code : " << e.code() << ",\n"
+                             "    message : \"" << e.to_string() << "\","
+                             "    detail : \"\"\"\n" << e.to_detail_string() << "\n\"\"\""
+                             "  }\n";
+                // TODO:  Escape above 
             }
-            
+            std::cout << "}\n";
+
             std::string cmp_op = "nop";
             fc::variant cmp_op_arg;
             if( cmd.size() >= 5 )
