@@ -257,7 +257,7 @@ void context::set_genesis(const fc::path& genesis_json_filename)
         this->genesis_json_filename = genesis_json_filename;
         this->genesis_config = fc::json::from_file(genesis_json_filename).as<bts::blockchain::genesis_block_config>();
         this->template_context["genesis.timestamp"] = this->genesis_config.timestamp.to_iso_string();
-        this->add_client_argument("all", "--genesis-json=" + genesis_json_filename.string());
+        this->add_client_argument("all", "--genesis-config=" + genesis_json_filename.string());
     }
     FC_CAPTURE_AND_RETHROW()
     return;
@@ -268,20 +268,44 @@ void context::create_client(const std::string& name)
     try
     {
         client_context_ptr cc = std::make_shared<client_context>();
+
+        cc->client = std::make_shared<bts::client::client>("tscript", this->sim_network);
+        cc->client->set_client_debug_name(name);
+
         cc->args.push_back("--disable-default-peers");
         cc->args.push_back("--log-commands");
         cc->args.push_back("--ulog=0");
         cc->args.push_back("--min-delegate-connection-count=0");
         cc->args.push_back("--upnp=false");
         cc->args.push_back("--data-dir=" + this->get_data_dir_for_client(name).string());
-        
-        cc->client = std::make_shared<bts::client::client>("tscript", this->sim_network);
-        cc->configure_client_from_args();
-        cc->client->set_client_debug_name(name);
-        cc->template_context["client.name"] = name;
 
         this->m_name_client[name] = cc;
         this->m_name_client_group["all"].push_back(name);
+
+        cc->template_context["client.name"] = name;
+
+        // late binding here ensures that all is effective even
+        //    on clients that weren't defined at the time
+        for( const std::pair<std::string, std::vector<std::string>>& gname_args : this->m_clientname_arg )
+        {
+            const std::string& gname = gname_args.first;
+            const std::vector<std::string>& args = gname_args.second;
+            std::vector<client_context_ptr> u;
+            this->get_clients_by_variant( gname, u );
+            for(const client_context_ptr& e : u)
+            {
+                if( e->client->get_client_debug_name() == name )
+                {
+                    for( const std::string& arg : args )
+                    {
+                        cc->args.push_back( arg );
+                    }
+                    break;
+                }
+            }
+        }
+
+        cc->configure_client_from_args();
     }
     FC_CAPTURE_AND_RETHROW()
 
