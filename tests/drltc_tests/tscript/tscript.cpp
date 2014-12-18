@@ -758,13 +758,16 @@ void help(int argc, char** argv)
     ${program_name} [options] targets
     
 Run on one or more *targets*.  Each target may be a .tscript file,
-or a directory containing .tscript files.
+or a directory containing .tscript files.  Using the special name 'b'
+will break.
 
 Options:
 
-    --break : Break after executing each tscript.
-    --nobreak : Don't break after executing each tscript.
-    --help : Display this help message.
+    --break                Break into interactive mode.
+    --genesis=FILE         Use genesis state specified in FILE
+    --help                 Display this help message.
+    --CLIENT:ARG(=VALUE)   Pass argument ARG (or ARG=VALUE) to client CLIENT
+    --all:ARG(=VALUE)      Pass argument to all clients
 
 )msg", d);
     return;
