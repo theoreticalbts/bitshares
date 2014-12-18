@@ -144,6 +144,7 @@ namespace bts { namespace client {
          void init_cli();
          void set_daemon_mode(bool daemon_mode);
          void set_client_debug_name(const string& name);
+         string get_client_debug_name()const;
 
 
          chain_database_ptr         get_chain()const;

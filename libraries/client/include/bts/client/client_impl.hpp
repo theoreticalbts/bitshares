@@ -206,6 +206,11 @@ public:
       _config.client_debug_name = name;
       return;
    }
+   
+   string get_client_debug_name() const
+   {
+       return _config.client_debug_name;
+   }
 
    /* Implement node_delegate */
    // @{

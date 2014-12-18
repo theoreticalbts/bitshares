@@ -1853,6 +1853,11 @@ void client::set_client_debug_name(const string& name)
    return my->set_client_debug_name(name);
 }
 
+string client::get_client_debug_name() const
+{
+   return my->get_client_debug_name();
+}
+
 /**
   * Detail Implementation
   */
