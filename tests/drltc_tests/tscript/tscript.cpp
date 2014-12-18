@@ -207,7 +207,6 @@ void client_context::configure_client_from_args()
         for(int i=1;i<argc;i++)
             v_argv.push_back(v_argv[0] + arg_offset[i]);
 
-        std::cout << "client invocation:";
         for(int i=0;i<argc;i++)
         {
             std::cout << v_argv.data()[i] << " ";
@@ -312,18 +311,15 @@ void context::get_clients_by_variant(const fc::variant& spec, std::vector<client
         if( spec.is_string() )
         {
             std::string target_name = spec.get_string();
-            std::cout << "in spec.is_string() : target=" << target_name << "\n";
             auto p = this->m_name_client_group.find(target_name);
             if( p != this->m_name_client_group.end() )
             {
-                std::cout << "   found group\n";
                 for( const fc::string& e : p->second )
                 {
                     auto q = this->m_name_client.find(e);
                     if( q != this->m_name_client.end() )
                     {
                         result.push_back(q->second);
-                        std::cout << "   group member " << e << " found\n";
                     }
                     else
                         FC_ASSERT(false, "couldn't find named client when expanding group definition");
@@ -333,7 +329,6 @@ void context::get_clients_by_variant(const fc::variant& spec, std::vector<client
             auto q = this->m_name_client.find(target_name);
             if( q != this->m_name_client.end() )
             {
-                std::cout << "   found singleton\n";
                 result.push_back(q->second);
                 return;
             }
@@ -437,7 +432,6 @@ void interpreter::run_cli_command(
         else
         {
             // split command according to CLI command splitting logic
-            std::cout << "splitting line: " << action << "\n";
             fc::variants rpc_cmd_args = split_line( action );
             if( rpc_cmd_args.size() == 0 )
                 return;
@@ -446,8 +440,7 @@ void interpreter::run_cli_command(
             rpc_cmd_args.erase( rpc_cmd_args.begin() );
             
             fc::variants actual_cmd( { "x", client_name, rpc_cmd, rpc_cmd_args } );
-            std::cout << "line split as: " << fc::json::to_string( rpc_cmd ) << "\n";
-            std::cout << "running as: " << fc::json::to_string( actual_cmd ) << "\n";
+            std::cout << fc::json::to_string( actual_cmd ) << "\n";
             this->run_single_command( actual_cmd );
         }
     }
@@ -512,21 +505,22 @@ void interpreter::cmd_x(const fc::variants& cmd)
     {
         FC_ASSERT( cmd.size() >= 3 );
 
-        std::cout << "in cmd_x\n";
-        
         std::vector<bts::tscript::client_context_ptr> targets;
         
         this->ctx->get_clients_by_variant( cmd[1], targets );
 
-        std::cout << "targets found: " << targets.size() << "\n";
+        fc::variants client_names;
+        for( bts::tscript::client_context_ptr& t : targets )
+            client_names.push_back( fc::variant( t->client->debug_get_client_name() ) );
+        std::cout << "targets : " << fc::json::to_string( client_names ) << "\n";
 
         for( bts::tscript::client_context_ptr& t : targets )
         {
-            std::cout << "   " << t->client->debug_get_client_name() << ":\n";
+            std::cout << ">>> " << t->client->debug_get_client_name() << ": ";
 
             const std::string& method_name = cmd[2].get_string();
 
-            std::cout << "      " << method_name << "\n";
+            std::cout << method_name;
             
             // create context for command by combining template context dictionaries
             fc::mutable_variant_object effective_ctx;
@@ -547,8 +541,9 @@ void interpreter::cmd_x(const fc::variants& cmd)
                 {
                     args[i] = fc::format_string(args[i].get_string(), v_effective_ctx);
                 }
-                std::cout << "      " << fc::json::to_string(args[i]) << "\n";
+                std::cout << " " << fc::json::to_string(args[i]);
             }
+            std::cout << "\n";
             
             fc::optional<fc::variant> result;
             fc::optional<fc::exception> exc;
