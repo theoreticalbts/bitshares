@@ -58,11 +58,13 @@ public:
     fc::path get_data_dir_for_client(const std::string& name) const;
     
     void get_clients_by_variant(const fc::variant& spec, std::vector<client_context_ptr>& result, int depth=0);
+    void add_client_argument(const std::string& cname, const std::string& arg);
     
     fc::path basedir;
     std::vector<client_context_ptr> v_clients;
     std::map<std::string, client_context_ptr> m_name_client;
     std::map<std::string, std::vector<std::string>> m_name_client_group;
+    std::map<std::string, std::vector<std::string>> m_clientname_arg;
     std::map<std::string, std::string> template_context;
     fc::path genesis_json_filename;
     bts::blockchain::genesis_block_config genesis_config;
@@ -80,6 +82,7 @@ public:
     
     void run_single_command(const fc::variants& cmd);
     void run_command_list(const fc::variants& cmd_list);
+    void run_filename(const fc::path& filename, bool allow_dir=true);
     void run_file(const fc::path& path);
     void run_cli_command(
         const std::string& client_name,
@@ -88,7 +91,7 @@ public:
     void run_interp_command(
         const fc::variants& cmd
         );
-    
+
     void cmd_clients(const fc::variants& args);
     void cmd_x(const fc::variants& cmd);
     
@@ -254,6 +257,7 @@ void context::set_genesis(const fc::path& genesis_json_filename)
         this->genesis_json_filename = genesis_json_filename;
         this->genesis_config = fc::json::from_file(genesis_json_filename).as<bts::blockchain::genesis_block_config>();
         this->template_context["genesis.timestamp"] = this->genesis_config.timestamp.to_iso_string();
+        this->add_client_argument("all", "--genesis-json=" + genesis_json_filename.string());
     }
     FC_CAPTURE_AND_RETHROW()
     return;
@@ -269,7 +273,6 @@ void context::create_client(const std::string& name)
         cc->args.push_back("--ulog=0");
         cc->args.push_back("--min-delegate-connection-count=0");
         cc->args.push_back("--upnp=false");
-        cc->args.push_back("--genesis-config=" + this->genesis_json_filename.string());
         cc->args.push_back("--data-dir=" + this->get_data_dir_for_client(name).string());
         
         cc->client = std::make_shared<bts::client::client>("tscript", this->sim_network);
@@ -338,6 +341,15 @@ void context::get_clients_by_variant(const fc::variant& spec, std::vector<client
         FC_ASSERT(false, "expected: client-spec");
     }
     FC_CAPTURE_AND_RETHROW()
+}
+
+void context::add_client_argument(const std::string& cname, const std::string& arg)
+{
+    // map::insert() is no-op if key exists, first returns new element or old if key exists
+    if( this->m_clientname_arg.find( cname ) == this->m_clientname_arg.end() )
+        this->m_clientname_arg[cname] = std::vector<std::string>();
+    this->m_clientname_arg[cname].push_back(arg);
+    return;
 }
 
 interpreter::interpreter()
@@ -475,7 +487,15 @@ void interpreter::run_file(const fc::path& path)
         std::cout << e.to_detail_string() << "\n";
         exit(1);
     }
-    this->run_command_list(v);
+    try
+    {
+        this->run_command_list(v);
+    }
+    catch( const fc::exception& e )
+    {
+        std::cout << "problem running file " << path.string() << "\n";
+        std::cout << e.to_detail_string() << "\n";
+    }
     return;
 }
 
@@ -663,65 +683,38 @@ void interpreter::interact()
     return;
 }
 
-void run_single_tscript(
-    const fc::path& genesis_json_filename,
-    const fc::path& tscript_filename,
-    bool break_after
+void interpreter::run_filename(
+    const fc::path& target_filename,
+    bool allow_dir
     )
 {
     try
     {
-        FC_ASSERT( fc::is_regular_file(tscript_filename) );
-
         // delete client directories
         fc::remove_all( "tmp/client" );
 
-        bts::tscript::interpreter interp;
-        interp.ctx->set_genesis(genesis_json_filename);
-        try
+        if( fc::is_directory(target_filename) )
         {
-            interp.run_file(tscript_filename);
-        }
-        catch( const fc::exception& e )
-        {
-            std::cout << e.to_detail_string() << "\n";
-        }
-        
-        if( break_after )
-            interp.interact();
-    }
-    FC_CAPTURE_AND_RETHROW()
+            FC_ASSERT( allow_dir, "target filename is directory" );
 
-    return;
-}
-
-void run_tscripts(
-    const fc::path& genesis_json_filename,
-    const fc::path& target_filename,
-    bool break_after
-    )
-{
-    try
-    {
-        if( !fc::is_directory(target_filename) )
-        {
-            run_single_tscript( genesis_json_filename, target_filename, break_after );
-            return;
-        }
-
-        for( fc::recursive_directory_iterator it(target_filename), it_end;
-             it != it_end; ++it )
-        {
-            fc::path filename = (*it);
-            try
+            for( fc::recursive_directory_iterator it(target_filename), it_end;
+                 it != it_end; ++it )
             {
-                if( !fc::is_regular_file(filename) )
-                    continue;
-                if( !endswith(filename.string(), ".tscript") )
-                    continue;
-                run_single_tscript(genesis_json_filename, filename, break_after);
+                fc::path filename = (*it);
+                try
+                {
+                    if( fc::is_directory(filename) )
+                        continue;
+                    if( !endswith(filename.string(), ".tscript") )
+                        continue;
+                    this->run_file( filename );
+                }
+                FC_CAPTURE_AND_RETHROW( (filename) );
             }
-            FC_CAPTURE_AND_RETHROW( (filename) );
+        }
+        else
+        {
+            this->run_file( target_filename );
         }
     }
     FC_CAPTURE_AND_RETHROW( (target_filename) );
@@ -760,6 +753,10 @@ int main(int argc, char** argv, char** envp)
     for( int i=1; i<argc; i++ )
         s_argv.push_back(std::string(argv[i]));
 
+    // b : Break at this point
+    // filename : run filename
+    // --client_list:arg(=value) : pass to all clients (must use =value syntax because this cmdline parser is unaware which options take values)
+
     for( const std::string& arg : s_argv )
     {
         std::string larg = fc::to_lower( arg );
@@ -775,21 +772,46 @@ int main(int argc, char** argv, char** envp)
         }
     }
     
-    bool break_after = false;
+    
+    bts::tscript::interpreter interp;
     
     for( int i=1; i<argc; i++ )
     {
         const std::string& arg = s_argv[i-1];
         std::string larg = fc::to_lower( arg );
-        if( larg == "--break" )
+        if( (larg == "b") || (larg == "--b") || (larg == "--break") )
         {
-            // break into CLI of first client
-            break_after = true;
+            interp.interact();
+            continue;
         }
-        else
+        if(    bts::tscript::startswith( arg, "--genesis-filename=" )
+            || bts::tscript::startswith( arg, "--genesis=")
+            || bts::tscript::startswith( arg, "--genesis-json=")
+            || bts::tscript::startswith( arg, "--genesis-json-filename=")
+          )
         {
-            bts::tscript::run_tscripts( "tmp/genesis.json", arg, break_after );
+            std::string name, value;
+            bts::tscript::split1(arg, "=", name, value);
+            interp.ctx->set_genesis(value);
+            continue;
         }
+        
+        if( bts::tscript::startswith( arg, "--" ) )
+        {
+            std::string empty, cname_arg_value, cname, arg_value;
+            bts::tscript::split1(arg, "--", empty, cname_arg_value);
+            if( !bts::tscript::split1(cname_arg_value, ":", cname, arg_value) )
+            {
+                std::cout << "unrecognized argument " << arg;
+                help(argc, argv);
+                return 1;
+            }
+            // arg_value may be split into arg=value but client will handle this
+            
+            interp.ctx->add_client_argument( cname, "--" + arg_value );
+            continue;
+        }
+        interp.run_filename( arg, true );
     }
     return 0;
 }
