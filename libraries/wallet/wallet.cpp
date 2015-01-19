@@ -349,8 +349,7 @@ namespace detail {
                                             const string& order_price,
                                             const string& base_symbol,
                                             const string& quote_symbol,
-                                            const string& limit,
-                                            const string& fund_quantity)
+                                            const string& limit)
    {
       // is_ba : is bid or ask
       // is_rel_ba : is relative bid or relative ask
@@ -415,32 +414,12 @@ namespace detail {
       if( !limit.empty() && atof(limit.c_str()) > 0 )
          price_limit = _blockchain->to_ugly_price(limit, base_symbol, quote_symbol, true);
 
-      // funding is only relevant for relative_bid.
-      optional<asset> funding;
-      if( !fund_quantity.empty() && atof(fund_quantity.c_str()) > 0 )
-         funding = _blockchain->to_ugly_asset(fund_quantity, quote_symbol);
-
       if( order_type == bid_order )
          builder->submit_bid(self->get_account(account_name), quantity, price_arg);
       else if( order_type == ask_order )
          builder->submit_ask(self->get_account(account_name), quantity, price_arg);
       else if( order_type == relative_bid_order )
-      {
-		 if ( !funding.valid() )
-		 {
-			 if( price_limit.valid() )
-				 funding = quantity * (*price_limit);
-			 else
-			 {
-                 optional<price> feed = _blockchain->get_active_feed_price(
-                     price_arg.quote_asset_id, price_arg.base_asset_id );
-			     if( !feed.valid() )
-                     FC_THROW_EXCEPTION( insufficient_feeds, "Relative bid must specify either limit price or funding amount when feed is not active" );
-                 funding = quantity * (*feed);
-			 }
-		 }
-         builder->submit_relative_bid(self->get_account(account_name), quantity, *funding, price_arg, price_limit);
-	  }
+         builder->submit_relative_bid(self->get_account(account_name), quantity, price_arg, price_limit);
       else if( order_type == relative_ask_order )
          builder->submit_relative_ask(self->get_account(account_name), quantity, price_arg, price_limit);
       else if( order_type == short_order )
@@ -771,6 +750,37 @@ namespace detail {
       FC_ASSERT( slate.supported_delegates.size() <= BTS_BLOCKCHAIN_MAX_SLATE_SIZE );
       std::sort( slate.supported_delegates.begin(), slate.supported_delegates.end() );
       return slate;
+   }
+
+   price wallet_impl::str_to_relative_price( const string& str, asset_id_type base, asset_id_type quote )
+   {
+	   price result( fc::uint128(), base, quote );
+	   
+	   int m = result.set_ratio_from_string( str );
+	   size_t n = str.length();
+
+       FC_ASSERT( n > 1, "invalid relative price" );
+	   FC_ASSERT( m > 0 );
+	   FC_ASSERT( m <= n );
+	   if( m < n )
+	   {
+		   FC_ASSERT( m == n-1 );
+		   if( str[m] == '%' )
+		   {
+			   
+		   }
+	   }
+	   
+	   string s;
+	   FC_ASSERT( n > 0 );
+	   if( str[n-1] == "%" )
+	   {
+		   FC_ASSERT( n > 1 );
+		   s = str.substr( 0, n-1 );
+	   }
+	   else
+	       s = str;
+	   return price( s );
    }
 
 } // bts::wallet::detail
@@ -3470,6 +3480,46 @@ namespace detail {
                              (real_quantity)(quantity_symbol)
                              (quote_price)(quote_symbol)(sign) ) }
 
+
+   wallet_transaction_record wallet::sell(
+           const string& from_account,
+           const string& sell_quantity,
+           const string& sell_quantity_symbol,
+           const string& price_limit,
+           const string& price_symbol,
+           const string& relative_percent,
+           bool sign
+   )
+   {
+      try
+      {
+         if( NOT is_open()     )
+             FC_CAPTURE_AND_THROW( wallet_closed );
+         if( NOT is_unlocked() )
+             FC_CAPTURE_AND_THROW( wallet_locked );
+
+         auto relative_percent = wallet_impl::
+
+         transaction_builder_ptr builder = create_transaction_builder();
+         my->apply_order_to_builder(relative_bid_order,
+                                    builder,
+                                    from_account,
+                                    sell_quantity,
+                                    relative_percent,
+                                    sell_quantity_symbol,
+                                    price_symbol,
+                                    price_limit);
+         builder->finalize();
+
+         if( sign )
+            return builder->sign();
+         return builder->transaction_record;
+      } FC_CAPTURE_AND_RETHROW( (from_account)
+                                (sell_quantity)(sell_quantity_symbol)
+                                (price_limit)(price_symbol)
+                                (relative_percent)(sign) ) }	   
+   }
+   
 
    wallet_transaction_record wallet::submit_relative_bid(
            const string& from_account_name,

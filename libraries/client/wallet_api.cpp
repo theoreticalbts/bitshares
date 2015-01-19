@@ -1427,16 +1427,16 @@ wallet_transaction_record client_impl::wallet_market_submit_bid(
   network_broadcast_transaction( record.trx );
   return record;
 }
-wallet_transaction_record client_impl::wallet_market_submit_relative_bid(
+wallet_transaction_record client_impl::wallet_market_sell(
        const string& from_account,
-       const string& quantity,
-       const string& quantity_symbol,
-       const string& relative_quote_price,
-       const string& quote_symbol,
-       const string& limit_price,
-       const string& funding )
+       const string& sell_quantity,
+       const string& sell_quantity_symbol,
+       const string& price_limit,
+       const string& price_symbol,
+       const string& relative_percent
+       )
 {
-  auto record = _wallet->submit_relative_bid( from_account, quantity, quantity_symbol, relative_quote_price, quote_symbol, limit_price, funding, true );
+  auto record = _wallet->sell( from_account, sell_quantity, sell_quantity_symbol, price_limit, price_symbol, relative_percent );
   _wallet->cache_transaction( record );
   network_broadcast_transaction( record.trx );
   return record;

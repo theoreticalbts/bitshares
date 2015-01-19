@@ -285,6 +285,8 @@ class wallet_impl : public chain_observer
           }
           return cache_deposit;
       }
+      
+      static price str_to_relative_price( const string& str );
 };
 
 } } } // bts::wallet::detail

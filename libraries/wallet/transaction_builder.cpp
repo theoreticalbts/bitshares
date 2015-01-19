@@ -467,8 +467,7 @@ transaction_builder& transaction_builder::submit_bid(const wallet_account_record
 
 
 transaction_builder& transaction_builder::submit_relative_bid(const wallet_account_record& from_account,
-                                                     const asset& real_quantity,
-                                                     const asset& funding,
+                                                     const asset& sell_quantity,
                                                      const price& quote_price,
                                                      const optional<price>& limit )
 { try {
@@ -479,8 +478,8 @@ transaction_builder& transaction_builder::submit_relative_bid(const wallet_accou
    auto order_key = order_key_for_account(from_account.owner_address(), from_account.name);
 
    //Charge this account for the bid
-   deduct_balance(from_account.owner_address(), funding);
-   trx.relative_bid(funding, quote_price, limit, order_key);
+   deduct_balance(from_account.owner_address(), sell_quantity);
+   trx.relative_bid(sell_quantity, quote_price, limit, order_key);
 
    auto entry = ledger_entry();
    entry.from_account = from_account.owner_key;
