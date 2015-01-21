@@ -1993,9 +1993,9 @@
                "default_value" : ""
             },
             {
-               "name" : "relative_pct",
+               "name" : "relative_price",
                "type" : "string",
-               "description" : "the percentage of the feed",
+               "description" : "a fraction of the price feed, e.g. 5% above is 1.05 or 105%",
                "default_value" : "0"
             },
             {

@@ -349,7 +349,7 @@ namespace detail {
                                             const string& sell_quantity_symbol,
                                             const string& price_limit,
                                             const string& price_symbol,
-                                            const string& relative_percent,
+                                            const string& relative_price_str,
                                             bool allow_stupid
                                             )
    {
@@ -374,7 +374,7 @@ namespace detail {
 		   const string& quote_symbol = sell_quantity_symbol;
 		   
    	       price relative_price = str_to_relative_price(
-   	           relative_percent, base_symbol, quote_symbol );
+   	           relative_price_str, base_symbol, quote_symbol );
 
 	       price limit_price = _blockchain->to_ugly_price(
                price_limit, base_symbol, quote_symbol, true);
@@ -416,7 +416,7 @@ namespace detail {
 		   const string& quote_symbol = price_symbol;
 
    	       price relative_price = str_to_relative_price(
-   	           relative_percent, base_symbol, quote_symbol );
+   	           relative_price_str, base_symbol, quote_symbol );
 		   
 	       price limit_price = _blockchain->to_ugly_price(
                price_limit, base_symbol, quote_symbol, true);

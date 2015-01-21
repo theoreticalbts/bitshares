@@ -1382,11 +1382,11 @@ wallet_transaction_record client_impl::wallet_market_sell(
        const string& sell_quantity_symbol,
        const string& price_limit,
        const string& price_symbol,
-       const string& relative_percent,
+       const string& relative_price,
        bool allow_stupid
        )
 {
-  auto record = _wallet->sell( from_account, sell_quantity, sell_quantity_symbol, price_limit, price_symbol, relative_percent, allow_stupid, true );
+  auto record = _wallet->sell( from_account, sell_quantity, sell_quantity_symbol, price_limit, price_symbol, relative_price, allow_stupid, true );
   _wallet->cache_transaction( record );
   network_broadcast_transaction( record.trx );
   return record;
