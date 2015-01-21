@@ -1989,7 +1989,8 @@
             {
                "name" : "price_symbol",
                "type" : "asset_symbol",
-               "description" : "the type of asset you would like to be paid"
+               "description" : "the type of asset you would like to be paid",
+               "default_value" : ""
             },
             {
                "name" : "relative_pct",
