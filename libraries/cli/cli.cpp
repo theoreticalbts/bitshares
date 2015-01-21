@@ -502,7 +502,7 @@ namespace bts { namespace cli {
 
                 try
                 {
-                  bts::blockchain::address::is_valid(address_string);
+                  // bts::blockchain::address::is_valid(address_string);
                 }
                 catch( fc::exception& e )
                 {

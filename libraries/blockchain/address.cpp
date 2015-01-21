@@ -10,7 +10,7 @@ namespace bts {
 
    address::address( const std::string& base58str )
    {
-      FC_ASSERT( is_valid( base58str ) );
+      // FC_ASSERT( is_valid( base58str ) );
       std::string prefix( BTS_ADDRESS_PREFIX );
       std::vector<char> v = fc::from_base58( base58str.substr( prefix.size() ) );
       memcpy( (char*)addr._hash, v.data(), std::min<size_t>( v.size()-4, sizeof( addr ) ) );
@@ -27,6 +27,7 @@ namespace bts {
     *
     *  @return true if successful, throws an exception with reason if invalid.
     */
+   /*
     // TODO: This should return false rather than throwing
    bool address::is_valid( const std::string& base58str )
    { try {
@@ -41,6 +42,7 @@ namespace bts {
       FC_ASSERT( memcmp( v.data() + 20, (char*)checksum._hash, 4 ) == 0, "address checksum mismatch" );
       return true;
    } FC_RETHROW_EXCEPTIONS( warn, "invalid address '${a}'", ("a", base58str) ) }
+   */
 
    address::address( const fc::ecc::public_key& pub )
    {

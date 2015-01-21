@@ -36,7 +36,7 @@ namespace bts { namespace blockchain {
        address( const withdraw_condition& condition );
        address( const public_key_type& pubkey );
 
-       static bool is_valid(const std::string& base58str );
+       // static bool is_valid(const std::string& base58str );
        explicit operator    std::string()const; ///< converts to base58 + checksum
 
        fc::ripemd160      addr;
