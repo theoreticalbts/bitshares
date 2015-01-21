@@ -354,7 +354,6 @@ namespace detail {
                                             )
    {
 	   // TODO:  allow_stupid
-	   price relative_price = str_to_relative_price( relative_percent );
 	   oasset_record sell_arec = _blockchain->get_asset_record( sell_quantity_symbol );
 	   oasset_record price_arec = _blockchain->get_asset_record( price_symbol );	   
 
@@ -374,9 +373,12 @@ namespace detail {
 		   const string& base_symbol = price_symbol;
 		   const string& quote_symbol = sell_quantity_symbol;
 		   
+   	       price relative_price = str_to_relative_price(
+   	           relative_percent, base_symbol, quote_symbol );
+
 	       price limit_price = _blockchain->to_ugly_price(
                price_limit, base_symbol, quote_symbol, true);
-	           
+
 		   if( relative_price.ratio > 0 )
 		   {
 			   // relative bid.
@@ -412,6 +414,9 @@ namespace detail {
 		   const asset_id_type quote_id = price_arec->id;
 		   const string& base_symbol = sell_quantity_symbol;
 		   const string& quote_symbol = price_symbol;
+
+   	       price relative_price = str_to_relative_price(
+   	           relative_percent, base_symbol, quote_symbol );
 		   
 	       price limit_price = _blockchain->to_ugly_price(
                price_limit, base_symbol, quote_symbol, true);
@@ -863,35 +868,33 @@ namespace detail {
       return slate;
    }
 
-   price wallet_impl::str_to_relative_price( const string& str, asset_id_type base, asset_id_type quote )
+   price wallet_impl::str_to_relative_price( const string& str, const string& base_symbol, const string& quote_symbol )
    {
-	   price result( fc::uint128(), base, quote );
-	   
 	   int m = result.set_ratio_from_string( str );
 	   size_t n = str.length();
 
        FC_ASSERT( n > 1, "invalid relative price" );
 	   FC_ASSERT( m > 0 );
 	   FC_ASSERT( m <= n );
+	   
+	   string s;
+	   bool divide_by_100 = false;
+	   
 	   if( m < n )
 	   {
 		   FC_ASSERT( m == n-1 );
-		   if( str[m] == '%' )
-		   {
-			   
-		   }
-	   }
-	   
-	   string s;
-	   FC_ASSERT( n > 0 );
-	   if( str[n-1] == "%" )
-	   {
-		   FC_ASSERT( n > 1 );
+		   FC_ASSERT( str[m] == '%' );
 		   s = str.substr( 0, n-1 );
+		   divide_by_100 = true;
 	   }
 	   else
 	       s = str;
-	   return price( s );
+	   
+	   price result = _blockchain->to_ugly_price( s, base_symbol, quote_symbol, false );
+	   
+	   if( divide_by_100 )
+		   result.ratio /= 100;
+	   return result;
    }
 
 } // bts::wallet::detail
