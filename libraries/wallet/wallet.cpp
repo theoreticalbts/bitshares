@@ -3626,7 +3626,7 @@ namespace detail {
       } FC_CAPTURE_AND_RETHROW( (from_account)
                                 (sell_quantity)(sell_quantity_symbol)
                                 (price_limit)(price_symbol)
-                                (relative_percent)(sign) ) }	   
+                                (relative_percent)(sign) )
    }
 
    wallet_transaction_record wallet::submit_relative_ask(
