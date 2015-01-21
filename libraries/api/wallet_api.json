@@ -1968,7 +1968,7 @@
             {
                "name" : "from_account_name",
                "type" : "account_name",
-               "description" : "the account that will provide funds for the ask"
+               "description" : "the account that will provide funds for the order"
             },
             {
                "name" : "sell_quantity",
@@ -1996,6 +1996,12 @@
                "type" : "string",
                "description" : "the percentage of the feed",
                "default_value" : "0"
+            },
+            {
+               "name" : "allow_stupid",
+               "type" : "bool",
+               "description" : "Allow user to sell at less than 5% below the current top of book",
+               "default_value" : "false"
             }
          ],
          "prerequisites" : ["wallet_unlocked"],
