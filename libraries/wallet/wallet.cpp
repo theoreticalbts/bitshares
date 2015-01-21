@@ -870,20 +870,15 @@ namespace detail {
 
    price wallet_impl::str_to_relative_price( const string& str, const string& base_symbol, const string& quote_symbol )
    {
-	   int m = result.set_ratio_from_string( str );
 	   size_t n = str.length();
 
-       FC_ASSERT( n > 1, "invalid relative price" );
-	   FC_ASSERT( m > 0 );
-	   FC_ASSERT( m <= n );
-	   
 	   string s;
 	   bool divide_by_100 = false;
+
+       FC_ASSERT( n > 0 );
 	   
-	   if( m < n )
+	   if( str[n-1] == '%' )
 	   {
-		   FC_ASSERT( m == n-1 );
-		   FC_ASSERT( str[m] == '%' );
 		   s = str.substr( 0, n-1 );
 		   divide_by_100 = true;
 	   }
