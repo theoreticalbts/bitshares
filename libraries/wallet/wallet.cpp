@@ -361,7 +361,7 @@ namespace detail {
 	   FC_ASSERT( price_arec.valid(), "could not find record for asset being bought" );
 
        if( sell_arec->id == price_arec->id )
-          FC_CAPTURE_AND_THROW( invalid_market, (quote_id)(base_id) );
+          FC_CAPTURE_AND_THROW( invalid_market, (sell_quantity_symbol)(price_symbol) );
 
        const bool is_bid = (sell_arec->id > price_arec->id);
        if( is_bid )
