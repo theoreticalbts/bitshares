@@ -473,8 +473,6 @@ transaction_builder& transaction_builder::submit_relative_bid(const wallet_accou
 { try {
    validate_market(quote_price.quote_asset_id, quote_price.base_asset_id);
 
-   FC_ASSERT(funding.asset_id == quote_price.quote_asset_id);
-
    auto order_key = order_key_for_account(from_account.owner_address(), from_account.name);
 
    //Charge this account for the bid
@@ -484,7 +482,7 @@ transaction_builder& transaction_builder::submit_relative_bid(const wallet_accou
    auto entry = ledger_entry();
    entry.from_account = from_account.owner_key;
    entry.to_account = order_key;
-   entry.amount = funding;
+   entry.amount = sell_quantity;
    entry.memo = "relative buy " + _wimpl->_blockchain->get_asset_symbol(quote_price.base_asset_id) +
                 " @ delta " + _wimpl->_blockchain->to_pretty_price(quote_price);
 
@@ -493,7 +491,7 @@ transaction_builder& transaction_builder::submit_relative_bid(const wallet_accou
 
    required_signatures.insert(order_key);
    return *this;
-} FC_CAPTURE_AND_RETHROW( (from_account.name)(funding)(quote_price) ) }
+} FC_CAPTURE_AND_RETHROW( (from_account.name)(sell_quantity)(quote_price) ) }
 
 transaction_builder& transaction_builder::submit_ask(const wallet_account_record& from_account,
                                                      const asset& cost,
