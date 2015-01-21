@@ -174,8 +174,7 @@ class wallet_impl : public chain_observer
                                   const string& order_price,
                                   const string& base_symbol,
                                   const string& quote_symbol,
-                                  const string& short_price_limit = string(),
-                                  const string& fund_quantity = string()
+                                  const string& short_price_limit = string()
                                  );
       
       void apply_sell_order_to_builder(
