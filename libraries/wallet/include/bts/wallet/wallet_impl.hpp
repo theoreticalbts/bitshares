@@ -177,7 +177,16 @@ class wallet_impl : public chain_observer
                                   const string& short_price_limit = string(),
                                   const string& fund_quantity = string()
                                  );
-
+      
+      void apply_sell_order_to_builder(
+                                       transaction_builder_ptr builder,
+                                       const string& from_account_name,
+                                       const string& sell_quantity,
+                                       const string& sell_quantity_symbol,
+                                       const string& price_limit,
+                                       const string& price_symbol,
+                                       const string& relative_percent
+                                      );
 
       template<typename ConditionType>
       bool scan_condition( const ConditionType& deposit, const asset& amount,

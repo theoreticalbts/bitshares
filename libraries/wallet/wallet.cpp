@@ -342,6 +342,110 @@ namespace detail {
        }
    }
 
+   void wallet_impl::apply_sell_order_to_builder(
+                                            transaction_builder_ptr builder,
+                                            const string& from_account_name,
+                                            const string& sell_quantity,
+                                            const string& sell_quantity_symbol,
+                                            const string& price_limit,
+                                            const string& price_symbol,
+                                            const string& relative_percent
+                                            )
+   {
+	   price relative_price = str_to_relative_price( relative_percent );
+	   oasset_record sell_arec = _blockchain->get_asset_record( sell_quantity_symbol );
+	   oasset_record price_arec = _blockchain->get_asset_record( price_symbol );	   
+
+       // TODO: Add symbol to error messages, use exception ID instead of assert
+	   FC_ASSERT( sell_arec.valid(), "could not find record for asset being sold" );
+	   FC_ASSERT( price_arec.valid(), "could not find record for asset being bought" );
+
+       if( sell_arec->id == price_arec->id )
+          FC_CAPTURE_AND_THROW( invalid_market, (quote_id)(base_id) );
+
+       const bool is_bid = (sell_arec->id > price_arec->id);
+       if( is_bid )
+       {
+		   // n.b. bid base/quote is opposite of ask
+		   const asset_id_type base_id = price_arec->id;
+		   const asset_id_type quote_id = sell_arec->id;
+		   const string& base_symbol = price_symbol;
+		   const string& quote_symbol = sell_quantity_symbol;
+		   
+	       price limit_price = _blockchain->to_ugly_price(
+               price_limit, base_symbol, quote_symbol, true);
+	           
+		   if( relative_price.amount > 0 )
+		   {
+			   // relative bid.
+               relative_price.base_asset_id = base_id;
+               relative_price.quote_asset_id = quote_id;
+			   my->apply_order_to_builder(relative_bid_order,
+			                              builder,
+			                              from_account_name,
+			                              sell_quantity,
+			                              relative_price,
+			                              base_symbol,
+			                              quote_symbol,
+			                              limit_price
+			                              );
+		   }
+		   else
+		   {
+			   // absolute bid.
+               my->apply_order_to_builder(bid_order,
+                                          builder,
+                                          from_account_name,
+                                          sell_quantity,
+                                          limit_price,
+                                          base_symbol,
+                                          quote_symbol
+                                          );
+		   }
+	   }
+	   else
+	   {
+		   // n.b. ask base/quote is opposite of bid
+		   const asset_id_type base_id = sell_arec->id;
+		   const asset_id_type quote_id = price_arec->id;
+		   const string& base_symbol = sell_quantity_symbol;
+		   const string& quote_symbol = price_symbol;
+		   
+	       price limit_price = _blockchain->to_ugly_price(
+               price_limit, base_symbol, quote_symbol, true);
+
+		   if( relative_price.amount > 0 )
+		   {
+			   // relative ask.
+               relative_price.base_asset_id = base_id;
+               relative_price.quote_asset_id = quote_id;
+
+               my->apply_order_to_builder(relative_ask_order,
+                                          builder,
+                                          from_account_name,
+                                          sell_quantity,
+                                          relative_price,
+                                          base_symbol,
+                                          quote_symbol,
+                                          limit_price
+                                          );
+		   }
+		   else
+		   {
+			   // absolute ask.
+               my->apply_order_to_builder(ask_order,
+                                          builder,
+                                          from_account_name,
+                                          sell_quantity,
+                                          limit_price,
+                                          base_symbol,
+                                          quote_symbol
+                                          );
+		   }
+	   }
+	   return;
+   }
+
    void wallet_impl::apply_order_to_builder(order_type_enum order_type,
                                             transaction_builder_ptr builder,
                                             const string& account_name,
@@ -351,6 +455,11 @@ namespace detail {
                                             const string& quote_symbol,
                                             const string& limit)
    {
+	  // description of "balance" parameter:
+	  // in the case of ask, relative ask, relative bid, "balance" is an existing balance to be sold
+	  // in the case of bid, "balance" is desired quantity to buy
+	  // TODO:  What is balance in case of short and cover?
+	   
       // is_ba : is bid or ask
       // is_rel_ba : is relative bid or relative ask
       const bool is_ba       = ((order_type ==          bid_order) | (order_type ==          ask_order));
@@ -3498,17 +3607,16 @@ namespace detail {
          if( NOT is_unlocked() )
              FC_CAPTURE_AND_THROW( wallet_locked );
 
-         auto relative_percent = wallet_impl::
-
          transaction_builder_ptr builder = create_transaction_builder();
-         my->apply_order_to_builder(relative_bid_order,
+         my->apply_sell_order_to_builder(
                                     builder,
                                     from_account,
                                     sell_quantity,
-                                    relative_percent,
                                     sell_quantity_symbol,
+                                    price_limit,
                                     price_symbol,
-                                    price_limit);
+                                    relative_percent
+                                    );
          builder->finalize();
 
          if( sign )
@@ -3519,40 +3627,7 @@ namespace detail {
                                 (price_limit)(price_symbol)
                                 (relative_percent)(sign) ) }	   
    }
-   
 
-   wallet_transaction_record wallet::submit_relative_bid(
-           const string& from_account_name,
-           const string& real_quantity,
-           const string& quantity_symbol,
-           const string& relative_quote_price,
-           const string& quote_symbol,
-           const string& limit_price,
-           const string& funding,
-           bool sign )
-   { try {
-      if( NOT is_open()     ) FC_CAPTURE_AND_THROW( wallet_closed );
-      if( NOT is_unlocked() ) FC_CAPTURE_AND_THROW( wallet_locked );
-
-      transaction_builder_ptr builder = create_transaction_builder();
-      my->apply_order_to_builder(relative_bid_order,
-                                 builder,
-                                 from_account_name,
-                                 real_quantity,
-                                 relative_quote_price,
-                                 quantity_symbol,
-                                 quote_symbol,
-                                 limit_price,
-                                 funding);
-      builder->finalize();
-
-      if( sign )
-         return builder->sign();
-      return builder->transaction_record;
-   } FC_CAPTURE_AND_RETHROW( (from_account_name)
-                             (real_quantity)(quantity_symbol)
-                             (relative_quote_price)(quote_symbol)
-                             (limit_price)(funding)(sign) ) }
    wallet_transaction_record wallet::submit_relative_ask(
            const string& from_account_name,
            const string& real_quantity,
