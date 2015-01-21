@@ -375,32 +375,32 @@ namespace detail {
 	       price limit_price = _blockchain->to_ugly_price(
                price_limit, base_symbol, quote_symbol, true);
 	           
-		   if( relative_price.amount > 0 )
+		   if( relative_price.ratio > 0 )
 		   {
 			   // relative bid.
                relative_price.base_asset_id = base_id;
                relative_price.quote_asset_id = quote_id;
-			   my->apply_order_to_builder(relative_bid_order,
-			                              builder,
-			                              from_account_name,
-			                              sell_quantity,
-			                              relative_price,
-			                              base_symbol,
-			                              quote_symbol,
-			                              limit_price
-			                              );
+			   this->apply_order_to_builder(relative_bid_order,
+			                                builder,
+			                                from_account_name,
+			                                sell_quantity,
+			                                relative_price,
+			                                base_symbol,
+			                                quote_symbol,
+			                                limit_price
+			                               );
 		   }
 		   else
 		   {
 			   // absolute bid.
-               my->apply_order_to_builder(bid_order,
-                                          builder,
-                                          from_account_name,
-                                          sell_quantity,
-                                          limit_price,
-                                          base_symbol,
-                                          quote_symbol
-                                          );
+               this->apply_order_to_builder(bid_order,
+                                            builder,
+                                            from_account_name,
+                                            sell_quantity,
+                                            limit_price,
+                                            base_symbol,
+                                            quote_symbol
+                                           );
 		   }
 	   }
 	   else
@@ -414,33 +414,33 @@ namespace detail {
 	       price limit_price = _blockchain->to_ugly_price(
                price_limit, base_symbol, quote_symbol, true);
 
-		   if( relative_price.amount > 0 )
+		   if( relative_price.ratio > 0 )
 		   {
 			   // relative ask.
                relative_price.base_asset_id = base_id;
                relative_price.quote_asset_id = quote_id;
 
-               my->apply_order_to_builder(relative_ask_order,
-                                          builder,
-                                          from_account_name,
-                                          sell_quantity,
-                                          relative_price,
-                                          base_symbol,
-                                          quote_symbol,
-                                          limit_price
-                                          );
+               this->apply_order_to_builder(relative_ask_order,
+                                            builder,
+                                            from_account_name,
+                                            sell_quantity,
+                                            relative_price,
+                                            base_symbol,
+                                            quote_symbol,
+                                            limit_price
+                                           );
 		   }
 		   else
 		   {
 			   // absolute ask.
-               my->apply_order_to_builder(ask_order,
-                                          builder,
-                                          from_account_name,
-                                          sell_quantity,
-                                          limit_price,
-                                          base_symbol,
-                                          quote_symbol
-                                          );
+               this->apply_order_to_builder(ask_order,
+                                            builder,
+                                            from_account_name,
+                                            sell_quantity,
+                                            limit_price,
+                                            base_symbol,
+                                            quote_symbol
+                                           );
 		   }
 	   }
 	   return;
