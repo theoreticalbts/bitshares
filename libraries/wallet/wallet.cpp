@@ -3544,9 +3544,7 @@ namespace detail {
             my->apply_order_to_builder(order_description.first, builder,
                                        args[0], args[1], args[3], args[2], args[4],
                                        //For shorts:
-                                       args.size() > 5? args[5] : string(),
-                                       //For relative bids:
-                                       args.size() > 6 ? args[6] : string()
+                                       args.size() > 5? args[5] : string()
                                        );
             break;
          default:
