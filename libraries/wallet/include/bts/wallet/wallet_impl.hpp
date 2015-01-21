@@ -184,7 +184,8 @@ class wallet_impl : public chain_observer
                                        const string& sell_quantity_symbol,
                                        const string& price_limit,
                                        const string& price_symbol,
-                                       const string& relative_percent
+                                       const string& relative_percent,
+                                       bool allow_stupid
                                       );
 
       template<typename ConditionType>

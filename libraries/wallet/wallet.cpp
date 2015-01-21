@@ -349,9 +349,11 @@ namespace detail {
                                             const string& sell_quantity_symbol,
                                             const string& price_limit,
                                             const string& price_symbol,
-                                            const string& relative_percent
+                                            const string& relative_percent,
+                                            bool allow_stupid
                                             )
    {
+	   // TODO:  allow_stupid
 	   price relative_price = str_to_relative_price( relative_percent );
 	   oasset_record sell_arec = _blockchain->get_asset_record( sell_quantity_symbol );
 	   oasset_record price_arec = _blockchain->get_asset_record( price_symbol );	   
@@ -3616,7 +3618,8 @@ namespace detail {
                                     sell_quantity_symbol,
                                     price_limit,
                                     price_symbol,
-                                    relative_percent
+                                    relative_percent,
+                                    allow_stupid
                                     );
          builder->finalize();
 
