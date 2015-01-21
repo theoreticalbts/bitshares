@@ -3597,6 +3597,7 @@ namespace detail {
            const string& price_limit,
            const string& price_symbol,
            const string& relative_percent,
+           bool allow_stupid,
            bool sign
    )
    {
