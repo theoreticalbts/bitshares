@@ -8,7 +8,7 @@
 >>> debug_deterministic_private_keys 0 1 dan true dan true true
 >>> debug_deterministic_private_keys 0 1 emily true emily true true
 >>> wallet_market_submit_ask angel 1250000 XTS 0.02 USD
->>> wallet_market_submit_short angel 2500000 XTS 0 USD 5.0
+>>> wallet_market_submit_short angel 2500000 XTS 5 USD
 >>> balance angel
 >>> blockchain_market_order_book USD XTS
 >>> debug_advance_time 1 block
