@@ -77,4 +77,6 @@
 >>> balance charlie
 >>> balance dan
 >>> balance emily
+>>> wallet_account_transaction_history alice USD
+>>> wallet_market_order_list USD XTS -1 alice
 >>> quit
