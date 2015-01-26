@@ -77,4 +77,13 @@
 >>> wallet_account_transaction_history alice USD
 >>> wallet_market_order_list USD XTS -1 alice
 >>> wallet_market_cover alice 500 USD 411ac63f4ed5582ef425aca0df928636c7a24636
+>>> debug_advance_time 1 block
+>>> debug_wait_for_block_by_number 1 rlast
+>>> blockchain_market_order_book USD XTS
+>>> balance alice
+>>> debug_advance_time 1 block
+>>> debug_wait_for_block_by_number 1 rlast
+>>> blockchain_market_order_book USD XTS
+>>> balance alice
+>>> wallet_account_transaction_history alice USD
 >>> quit
