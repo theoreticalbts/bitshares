@@ -89,6 +89,7 @@
 >>> debug_advance_time 1 blocks
 >>> debug_wait_for_block_by_number 1 rlast
 >>> balance angel
+>>> get_info
 >>> wallet_account_transaction_history angel
 >>> wallet_market_order_list USD XTS -1 angel
 >>> wallet_market_cover angel 25000 USD 72e70a42f6ed52ef10672184c7f2193263aa885b
