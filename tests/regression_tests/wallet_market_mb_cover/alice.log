@@ -1,4 +1,5 @@
 >>> debug_advance_time 1 second
+>>> debug_wait_for_block_by_number 1 rlast
 >>> debug_advance_time 1 block
 >>> debug_wait_for_block_by_number 1 rlast
 >>> debug_deterministic_private_keys 0 1 angel true angel true true
