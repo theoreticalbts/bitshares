@@ -10,54 +10,64 @@ namespace bts { namespace blockchain {
       if( share_supply <= 0 ) return asset(0,condition.asset_id);
       if( yield_pool <= 0 )   return asset(0,condition.asset_id);
 
+      fc::uint128 current_supply( share_supply - yield_pool );
+      if( current_supply == 0 )
+         return asset(0, condition.asset_id);
+
       auto elapsed_time = (now - deposit_date);
-      if(  elapsed_time > fc::seconds( BTS_BLOCKCHAIN_MIN_YIELD_PERIOD_SEC ) )
+      if( elapsed_time <= fc::seconds( BTS_BLOCKCHAIN_MIN_YIELD_PERIOD_SEC ) )
+         return asset(0, condition.asset_id);
+      
+      fc::uint128 amount_withdrawn( amount );
+      amount_withdrawn *= 1000000;
+
+      fc::uint128 fee_fund( yield_pool );
+
+      //
+      // numerator in the following expression is at most
+      // BTS_BLOCKCHAIN_MAX_SHARES * 1000000 * BTS_BLOCKCHAIN_MAX_SHARES
+      // thus it cannot overflow
+      //
+      fc::uint128 yield = (amount_withdrawn * fee_fund) / current_supply;
+
+      /**
+       *  If less than 1 year, the 80% of yield are scaled linearly with time and 20% scaled by time^2,
+       *  this should produce a yield curve that is "80% simple interest" and 20% simulating compound
+       *  interest.
+       */
+      if( elapsed_time < fc::seconds( BTS_BLOCKCHAIN_MAX_YIELD_PERIOD_SEC ) )
       {
-         if( yield_pool > 0 && share_supply > 0 )
-         {
-            fc::uint128 amount_withdrawn( amount );
-            amount_withdrawn *= 1000000;
+         fc::uint128 original_yield = yield;
+         //
+         // discount the yield by 80%
+         //
+         // yield largest value in following multiplication is at most
+         // BTS_BLOCKCHAIN_MAX_SHARES * 1000000 * BTS_BLOCKCHAIN_MAX_SHARES * 8
+         // thus it cannot overflow
+         //
+         yield *= 8;
+         yield /= 10;
 
-            fc::uint128 current_supply( share_supply - yield_pool );
-            fc::uint128 fee_fund( yield_pool );
+         fc::uint128 delta_yield = original_yield - yield;
 
-            auto yield = (amount_withdrawn * fee_fund) / current_supply;
+         // yield == amount withdrawn / total usd  *  fee fund * fraction_of_year
+         yield *= elapsed_time.to_seconds();
+         yield /= BTS_BLOCKCHAIN_MAX_YIELD_PERIOD_SEC;
 
-            /**
-             *  If less than 1 year, the 80% of yield are scaled linearly with time and 20% scaled by time^2,
-             *  this should produce a yield curve that is "80% simple interest" and 20% simulating compound
-             *  interest.
-             */
-            if( elapsed_time < fc::seconds( BTS_BLOCKCHAIN_BLOCKS_PER_YEAR * BTS_BLOCKCHAIN_BLOCK_INTERVAL_SEC ) )
-            {
-               auto original_yield = yield;
-               // discount the yield by 80%
-               yield *= 8;
-               yield /= 10;
+         delta_yield *= elapsed_time.to_seconds();
+         delta_yield /= BTS_BLOCKCHAIN_MAX_YIELD_PERIOD_SEC;
 
-               auto delta_yield = original_yield - yield;
+         delta_yield *= elapsed_time.to_seconds();
+         delta_yield /= BTS_BLOCKCHAIN_MAX_YIELD_PERIOD_SEC;
 
-               // yield == amount withdrawn / total usd  *  fee fund * fraction_of_year
-               yield *= elapsed_time.to_seconds();
-               yield /= (BTS_BLOCKCHAIN_BLOCKS_PER_YEAR * BTS_BLOCKCHAIN_BLOCK_INTERVAL_SEC);
+         yield += delta_yield;
+      }
 
-               delta_yield *= elapsed_time.to_seconds();
-               delta_yield /= (BTS_BLOCKCHAIN_BLOCKS_PER_YEAR * BTS_BLOCKCHAIN_BLOCK_INTERVAL_SEC);
-
-               delta_yield *= elapsed_time.to_seconds();
-               delta_yield /= (BTS_BLOCKCHAIN_BLOCKS_PER_YEAR * BTS_BLOCKCHAIN_BLOCK_INTERVAL_SEC);
-
-               yield += delta_yield;
-            }
-
-            yield /= 1000000;
-            auto yield_amount = yield.to_uint64();
-
-            if( yield_amount > 0 && yield_amount < yield_pool )
-            {
-               return asset( yield_amount, condition.asset_id );
-            }
-         }
+      yield /= 1000000;
+      if( yield > 0 && yield < yield_pool )
+      {
+         uint64_t yield_amount = yield.to_uint64();
+         return asset( yield_amount, condition.asset_id );
       }
       return asset( 0, condition.asset_id );
    }
