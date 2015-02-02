@@ -955,7 +955,16 @@ namespace bts { namespace cli {
       {
         if( ! short_execution_price_valid )
         {
-          out << "Warning: Feeds expired, only bid+ask operate     ";
+          if( status->last_error && (status->last_error->code() == bts::blockchain::insufficient_feeds::code_value) )
+            // this case is when launching a new BitAsset, the whole
+            // market is shut down until there are adequate feeds
+            out << "Warning: Market not open until feeds published   ";
+          else
+            // this case is when too many feeds have expired on
+            // a BitAsset that has already been launched; bid/ask still
+            // works but feed-dependent orders won't be processed until
+            // we have a feed
+            out << "Warning: Feeds expired, only bid+ask operate     ";
         }
         else
         {
