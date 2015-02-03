@@ -1,0 +1,152 @@
+>>> debug_filter_output_for_tests false
+>>> debug_advance_time 1 second
+>>> debug_wait_for_block_by_number 1 rlast
+>>> debug_advance_time 1 block
+>>> debug_wait_for_block_by_number 1 rlast
+>>> debug_deterministic_private_keys 0 1 angel true angel true true
+>>> debug_deterministic_private_keys 0 1 alice true alice true true
+>>> debug_deterministic_private_keys 0 1 bob true bob true true
+>>> debug_deterministic_private_keys 0 1 charlie true charlie true true
+>>> debug_deterministic_private_keys 0 1 dan true dan true true
+>>> debug_deterministic_private_keys 0 1 emily true emily true true
+>>> wallet_market_submit_ask angel 1250000 XTS 0.02 USD
+>>> wallet_market_submit_short angel 2500000 XTS 5 USD
+>>> balance angel
+>>> blockchain_market_order_book USD XTS
+>>> debug_advance_time 1 block
+>>> debug_wait_for_block_by_number 1 rlast
+>>> blockchain_market_order_book USD XTS
+>>> balance angel
+>>> debug_advance_time 1 block
+>>> debug_wait_for_block_by_number 1 rlast
+>>> blockchain_market_order_book USD XTS
+>>> debug_enable_output false
+>>> wallet_publish_feeds_multi_experimental [["USD", "0.02"]]
+>>> debug_enable_output true
+>>> debug_advance_time 1 block
+>>> debug_wait_for_block_by_number 1 rlast
+>>> blockchain_market_order_book USD XTS
+>>> balance angel
+>>> debug_advance_time 1 block
+>>> debug_wait_for_block_by_number 1 rlast
+>>> blockchain_market_order_book USD XTS
+>>> blockchain_get_asset USD
+>>> balance angel
+>>> balance alice
+>>> balance bob
+>>> balance charlie
+>>> balance dan
+>>> balance emily
+>>> wallet_transfer 300 USD angel charlie
+>>> wallet_transfer 300 USD angel dan
+>>> wallet_transfer 300 USD angel emily
+>>> wallet_market_submit_short alice 50000 XTS 0 USD
+>>> wallet_market_submit_ask bob 25000 XTS 0.02 USD
+>>> debug_advance_time 1 block
+>>> debug_wait_for_block_by_number 1 rlast
+>>> blockchain_get_asset USD
+>>> blockchain_market_order_book USD XTS
+>>> balance alice
+>>> balance bob
+>>> balance charlie
+>>> balance dan
+>>> balance emily
+>>> debug_advance_time 1 block
+>>> debug_wait_for_block_by_number 1 rlast
+>>> blockchain_get_asset USD
+>>> blockchain_market_order_book USD XTS
+>>> balance alice
+>>> balance bob
+>>> balance charlie
+>>> balance dan
+>>> balance emily
+>>> wallet_transfer 200 USD charlie alice
+>>> wallet_transfer 200 USD dan alice
+>>> wallet_transfer 200 USD emily alice
+>>> debug_advance_time 1 block
+>>> debug_wait_for_block_by_number 1 rlast
+>>> blockchain_get_asset USD
+>>> blockchain_market_order_book USD XTS
+>>> balance alice
+>>> balance bob
+>>> balance charlie
+>>> balance dan
+>>> balance emily
+>>> debug_advance_time 1 block
+>>> debug_wait_for_block_by_number 1 rlast
+>>> blockchain_get_asset USD
+>>> blockchain_market_order_book USD XTS
+>>> balance alice
+>>> balance bob
+>>> balance charlie
+>>> balance dan
+>>> balance emily
+>>> wallet_account_transaction_history alice USD
+>>> debug_advance_time 20000 blocks
+>>> debug_wait_for_block_by_number 1 rlast
+>>> balance angel
+>>> wallet_market_submit_ask angel 1250000 XTS 0.02 USD
+>>> wallet_market_submit_short angel 2500000 XTS 5 USD
+>>> debug_advance_time 1 blocks
+>>> debug_wait_for_block_by_number 1 rlast
+>>> balance angel
+>>> blockchain_get_asset USD
+>>> blockchain_market_order_book USD XTS
+>>> debug_advance_time 1 blocks
+>>> debug_wait_for_block_by_number 1 rlast
+>>> balance angel
+>>> blockchain_get_asset USD
+>>> blockchain_market_order_book USD XTS
+>>> debug_advance_time 1 blocks
+>>> debug_wait_for_block_by_number 1 rlast
+>>> balance angel
+>>> blockchain_get_asset USD
+>>> blockchain_market_order_book USD XTS
+>>> debug_advance_time 1 blocks
+>>> debug_wait_for_block_by_number 1 rlast
+>>> balance angel
+>>> blockchain_get_asset USD
+>>> blockchain_market_order_book USD XTS
+>>> wallet_publish_feeds_multi_experimental [["USD", "0.02"]]
+>>> debug_advance_time 1 blocks
+>>> debug_wait_for_block_by_number 1 rlast
+>>> balance angel
+>>> blockchain_get_asset USD
+>>> blockchain_market_order_book USD XTS
+>>> debug_advance_time 1 blocks
+>>> debug_wait_for_block_by_number 1 rlast
+>>> balance angel
+>>> blockchain_get_asset USD
+>>> blockchain_market_order_book USD XTS
+>>> debug_advance_time 1 blocks
+>>> debug_wait_for_block_by_number 1 rlast
+
+>>> get_info
+>>> wallet_account_transaction_history angel
+>>> wallet_market_order_list USD XTS -1 angel
+>>> wallet_market_cover angel 26000 USD 791cde057d02a0e68393428b423ab08adbeba42c
+
+
+>>> debug_advance_time 1 blocks
+>>> debug_wait_for_block_by_number 1 rlast
+
+
+>>> debug_advance_time 1 blocks
+>>> debug_wait_for_block_by_number 1 rlast
+>>> blockchain_get_asset USD
+>>> wallet_account_transaction_history angel
+>>> wallet_account_yield alice
+>>> wallet_market_order_list USD XTS -1 alice
+>>> wallet_market_cover alice 500 USD c360b236c76df20c04f4c578d6d814700f2121f3
+>>> debug_advance_time 1 block
+>>> debug_wait_for_block_by_number 1 rlast
+>>> blockchain_get_asset USD
+>>> blockchain_market_order_book USD XTS
+>>> balance alice
+>>> debug_advance_time 1 block
+>>> debug_wait_for_block_by_number 1 rlast
+>>> blockchain_get_asset USD
+>>> blockchain_market_order_book USD XTS
+>>> balance alice
+>>> wallet_account_transaction_history alice USD
+>>> quit
