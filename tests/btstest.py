@@ -416,8 +416,16 @@ class Test(object):
         client.expect_regex(regex)
         return
 
+    def parse_metacommand(self, cmd):
+        cmd = cmd.split()
+        if cmd[0] == "!client":
+            self.context["active_client"] = cmd[1]
+            return
+        raise RuntimeError("unknown metacommand ", cmd)
+
     def execute_cmd(self, cmd):
-        print("cmd:", cmd)
+        if cmd.startswith("!"):
+            self.parse_metacommand(cmd)
 
         client = self.get_active_client()
         client.execute_cmd(cmd)
