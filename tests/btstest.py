@@ -446,7 +446,7 @@ def main():
 
         test = Test()
         # load all testenv's
-        for testenv_filename in args.testenv:
+        for testenv_filename in (args.testenv or []):
             test.load_testenv(testenv_filename)
         # and local testenv
         test.load_testenv(local_testenv_filename)
