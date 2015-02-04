@@ -1,3 +1,4 @@
+>>> !client alice
 >>> debug_start_simulated_time "20140620T144030.000000"
 >>> wallet_create default password
 >>> wallet_set_automatic_backups false
