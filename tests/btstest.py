@@ -366,12 +366,12 @@ class Test(object):
         compiled_testenv = compile(testenv_script, testenv_filename, "exec", dont_inherit=1)
 
         with add_to_sys_path(os.path.dirname(testenv_filename)):
-            exec compiled_testenv in self.context
+            exec(compiled_testenv, self.context)
         return
 
     def interpret_expr(self, expr, filename=""):
         compiled_expr = compile(expr, filename, "eval")
-        result = exec compiled_expr in self.context
+        result = exec(compiled_expr, self.context)
         if isinstance(result, str):
             self.expect_str(result)
         return
