@@ -433,7 +433,7 @@ def main():
 
     args = parser.parse_args()
 
-    for d in testdirs:
+    for d in args.testdirs:
         local_testenv_filename = os.path.join(d, "testenv")
         if not os.path.exists("testenv"):
             print("test "+d+" does not appear to be a test, skipping")
