@@ -367,7 +367,7 @@ class Test(object):
             testenv_script = f.read()
         compiled_testenv = compile(testenv_script, testenv_filename, "exec", dont_inherit=1)
 
-        with add_to_sys_path(os.path.dirname(testenv_filename)):
+        with add_to_sys_path([os.path.dirname(testenv_filename)]):
             exec(compiled_testenv, self.context)
         return
 
