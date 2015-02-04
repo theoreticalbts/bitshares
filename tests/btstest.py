@@ -411,6 +411,11 @@ class Test(object):
         client.expect_str(data)
         return
 
+    def expect_regex(self, regex):
+        client = self.get_active_client()
+        client.expect_regex(data)
+        return
+
     def execute_cmd(self, cmd):
         client = self.get_active_client()
         client.execute_cmd(data)
