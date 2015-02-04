@@ -435,7 +435,7 @@ def main():
 
     for d in args.testdirs:
         local_testenv_filename = os.path.join(d, "testenv")
-        if not os.path.exists("testenv"):
+        if not os.path.exists(local_testenv_filename):
             print("test "+d+" does not appear to be a test, skipping")
             continue
 
