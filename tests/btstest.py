@@ -413,12 +413,14 @@ class Test(object):
 
     def expect_regex(self, regex):
         client = self.get_active_client()
-        client.expect_regex(data)
+        client.expect_regex(regex)
         return
 
     def execute_cmd(self, cmd):
+        print("cmd:", cmd)
+
         client = self.get_active_client()
-        client.execute_cmd(data)
+        client.execute_cmd(cmd)
         return
 
     def parse_script(self, filename):
