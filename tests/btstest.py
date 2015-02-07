@@ -203,11 +203,11 @@ class ClientProcess(object):
             http_port = self.http_port
 
         args = [
-            "--p2p-port", p2p_port,
+            "--p2p-port", str(p2p_port),
             "--rpcuser", self.username,
             "--rpcpassword", self.password,
-            "--rpcport", rpc_port,
-            "--httpport", http_port,
+            "--rpcport", str(rpc_port),
+            "--httpport", str(http_port),
             "--disable-default-peers",
             "--disable-peer-advertising",
             "--min-delegate-connection-count", "0",
