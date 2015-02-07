@@ -218,6 +218,8 @@ class ClientProcess(object):
 
         args.extend(["--httpport", http_port])
 
+        print("args: ", args)
+
         self.process_object = subprocess.Popen(
             [self.client_exe]+args,
             stdout=subprocess.DEVNULL,
