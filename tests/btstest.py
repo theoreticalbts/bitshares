@@ -185,6 +185,7 @@ class ClientProcess(object):
             raise RuntimeError("start() called multiple times")
 
         data_dir = os.path.join(self.testdir, self.name)
+        self.data_dir = data_dir
 
         if callable(self.p2p_port):
             p2p_port = self.p2p_port()
@@ -222,7 +223,7 @@ class ClientProcess(object):
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             stdin=subprocess.PIPE,
-            cwd=self.data_dir,
+            cwd=data_dir,
             )
 
         self.rpc_client = RPCClient(dict(
