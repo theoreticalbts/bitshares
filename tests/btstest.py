@@ -358,7 +358,11 @@ class Test(object):
         self.context["active_client"] = ""
         self.context["expect_str"] = self.expect_str
         self.context["expect_regex"] = self.expect_regex
+        self.context["create_client"] = self.create_client
+        self.context["run_testdir"] = self.run_testdir
         self.context["regex"] = self.expect_regex
+        self.context["register_client"] = self.register_client
+        self.context["_btstest"] = sys.modules[__name__]
         return
 
     def load_testenv(self, testenv_filename):
@@ -366,6 +370,9 @@ class Test(object):
         with open(testenv_filename, "r") as f:
             testenv_script = f.read()
         compiled_testenv = compile(testenv_script, testenv_filename, "exec", dont_inherit=1)
+
+        self.context["my_filename"] = testenv_filename
+        self.context["my_path"] = os.path.dirname(testenv_filename)
 
         with add_to_sys_path([os.path.dirname(testenv_filename)]):
             exec(compiled_testenv, self.context)
@@ -441,6 +448,18 @@ class Test(object):
                     self.execute_cmd(line[p+4:])
         return
 
+    def run_testdir(self, testdir=None):
+        filenames = sorted(os.listdir(d))
+        for f in filenames:
+            if not f.endswith(".btstest"):
+                continue
+            test.parse_script(os.path.join(d, f))
+        return
+
+    def register_client(self, client=None):
+        self.name2client[client.name] = client
+        return
+
 def main():
     parser = argparse.ArgumentParser(description="Testing the future of banking.")
     parser.add_argument("testdirs", metavar="TEST", type=str, nargs="+", help="Test directory")
@@ -459,14 +478,9 @@ def main():
         for testenv_filename in (args.testenv or []):
             test.load_testenv(testenv_filename)
         # and local testenv
-        test.load_testenv(local_testenv_filename)
+        test.main_testenv(local_testenv_filename)
 
-        # TODO:  Move loop responsibility to testenv entry point function
-        filenames = sorted(os.listdir(d))
-        for f in filenames:
-            if not f.endswith(".btstest"):
-                continue
-            test.parse_script(os.path.join(d, f))
+        # we're actually done, since local testenv actually runs the test!
     return
 
 if __name__ == "__main__":
