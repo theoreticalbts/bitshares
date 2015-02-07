@@ -185,7 +185,10 @@ class ClientProcess(object):
             raise RuntimeError("start() called multiple times")
 
         data_dir = os.path.join(self.testdir, self.name)
-        self.data_dir = data_dir
+        if not os.path.exists(self.testdir):
+            os.makedirs(self.testdir)
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
 
         if callable(self.p2p_port):
             p2p_port = self.p2p_port()
