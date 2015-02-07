@@ -216,8 +216,6 @@ class ClientProcess(object):
             "--data-dir", data_dir,
             ]
 
-        args.extend(["--httpport", http_port])
-
         print("args: ", args)
 
         self.process_object = subprocess.Popen(
