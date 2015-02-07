@@ -153,19 +153,19 @@ class ClientProcess(object):
         self.http_port = http_port
 
         if username is None:
-            username = default_username
+            username = self.default_username
         self.username = username
 
         if password is None:
-            password = default_password
+            password = self.default_password
         self.password = password
 
         if genesis_config is None:
-            genesis_config = default_genesis_config
+            genesis_config = self.default_genesis_config
         self.genesis_config = genesis_config
 
         if testdir is None:
-            testdir = default_testdir
+            testdir = self.default_testdir
         self.testdir = testdir
 
         self.process_object = None
