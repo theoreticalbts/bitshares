@@ -358,7 +358,6 @@ class Test(object):
         self.context["active_client"] = ""
         self.context["expect_str"] = self.expect_str
         self.context["expect_regex"] = self.expect_regex
-        self.context["create_client"] = self.create_client
         self.context["run_testdir"] = self.run_testdir
         self.context["regex"] = self.expect_regex
         self.context["register_client"] = self.register_client
