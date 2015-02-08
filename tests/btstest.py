@@ -470,7 +470,7 @@ class Test(object):
         for f in filenames:
             if not f.endswith(".btstest"):
                 continue
-            test.parse_script(os.path.join(testdir, f))
+            self.parse_script(os.path.join(testdir, f))
         return
 
     def register_client(self, client=None):
