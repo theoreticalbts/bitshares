@@ -47,6 +47,7 @@ class RPCClient(object):
         return
 
     def call(self, method, *args):
+        print("calling URL:", self.rpc_url)
         # use the opener to fetch a URL
         o = { "method" : method, "params" : args, "id" : self.get_next_id() }
         #post_data = urllib.parse.urlencode(o).encode("UTF-8")
