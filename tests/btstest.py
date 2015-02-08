@@ -234,8 +234,8 @@ class ClientProcess(object):
 
         self.process_object = subprocess.Popen(
             [self.client_exe]+args,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            #stdout=subprocess.DEVNULL,
+            #stderr=subprocess.DEVNULL,
             stdin=subprocess.PIPE,
             cwd=data_dir,
             )
