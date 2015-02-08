@@ -227,7 +227,8 @@ class ClientProcess(object):
             "--upnp", "0",
             "--genesis-config", genesis_config,
             "--data-dir", data_dir,
-            "--log-commands", os.path.join(data_dir, "console.log"),
+            "--server",
+            #"--log-commands", os.path.join(data_dir, "console.log"),
             ]
 
         print("args: ", args)
