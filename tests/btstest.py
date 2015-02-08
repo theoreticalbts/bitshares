@@ -61,6 +61,11 @@ class RPCClient(object):
         self.next_request_id = result+1
         return result
 
+    def get_next_id(self):
+        result = self.next_request_id
+        self.next_request_id = result+1
+        return result
+
     def __call__(self, method, *args):
         return self.call(method, args)
 
