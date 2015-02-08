@@ -182,9 +182,10 @@ class ClientProcess(object):
         return
 
     def __enter__(self):
-        return self.start()
+        self.start()
+        return self
 
-    def __exit__(self):
+    def __exit__(self, exc_type, exc_value, traceback):
         self.stop()
         return
 
