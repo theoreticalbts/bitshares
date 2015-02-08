@@ -352,6 +352,8 @@ class TestClient(object):
         return
 
     def expect_regex(self, regex):
+        print("expecting regex:", regex)
+        print("matching at {} against {}", self.last_command_pos, repr(self.last_command_output))
         compiled_re = self.re_cache.get(regex)
         if compiled_re is None:
             compiled_re = re.compile(regex)
