@@ -326,7 +326,7 @@ class TestClient(object):
         if len(s) > 40:
             s = s[:40]
             dots = " ..."
-        m = self.last_command_output_pos
+        m = self.last_command_pos
         print("expected: "+repr(s)+dots)
 
         dots = ""
