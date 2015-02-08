@@ -410,6 +410,7 @@ class Test(object):
         return
 
     def interpret_expr(self, expr, filename=""):
+        expr = expr.strip()
         compiled_expr = compile(expr, filename, "eval")
         result = exec(compiled_expr, self.context)
         if isinstance(result, str):

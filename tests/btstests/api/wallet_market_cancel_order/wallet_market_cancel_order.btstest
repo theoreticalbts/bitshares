@@ -7,7 +7,7 @@ OK
 false
 >>> debug_deterministic_private_keys 0 101 init true
 [
-${ expect_regex(r'  ("[a-zA-Z0-9]*"[,]?\n){101} }$]
+${ expect_regex(r'  ("[a-zA-Z0-9]*"[,]?\n){101}') }$]
 >>>
 default (unlocked) >>> wallet_account_create test
 "XTS6nLGSU7AJwvY8WmgQ6y2kmqhwyT6DWKo4bPvBohXnWZR4hUXZt"
