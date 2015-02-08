@@ -192,7 +192,7 @@ class ClientProcess(object):
         if self.process_object is not None:
             raise RuntimeError("start() called multiple times")
 
-        data_dir = os.path.join(self.testdir, self.name)
+        data_dir = os.path.abspath(os.path.join(self.testdir, self.name))
         if not os.path.exists(self.testdir):
             os.makedirs(self.testdir)
         if not os.path.exists(data_dir):
@@ -213,6 +213,8 @@ class ClientProcess(object):
         else:
             http_port = self.http_port
 
+        genesis_config = os.path.abspath(self.genesis_config)
+
         args = [
             "--p2p-port", str(p2p_port),
             "--rpcuser", self.username,
@@ -223,7 +225,7 @@ class ClientProcess(object):
             "--disable-peer-advertising",
             "--min-delegate-connection-count", "0",
             "--upnp", "0",
-            "--genesis-config", self.genesis_config,
+            "--genesis-config", genesis_config,
             "--data-dir", data_dir,
             ]
 
