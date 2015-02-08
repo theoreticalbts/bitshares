@@ -421,11 +421,11 @@ class Test(object):
             error_file_info = ""
         else:
             error_file_info = " in file "+filename
-        begin_tag = line.find("${")
-        end_tag = line.find("}$")
         start_pos = 0
         print("splitting line:", repr(line))
         while True:
+            begin_tag = line.find("${", start_pos)
+            end_tag = line.find("}$", start_pos)
             if begin_tag < 0:
                 if end_tag < 0:
                     self.expect_str(line[start_pos:])
@@ -453,6 +453,7 @@ class Test(object):
     def expect_regex(self, regex):
         client = self.get_active_client()
         client.expect_regex(regex)
+        # TODO:  write regex result
         return
 
     def parse_metacommand(self, cmd):
