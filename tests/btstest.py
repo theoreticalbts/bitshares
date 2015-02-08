@@ -362,7 +362,6 @@ class TestClient(object):
         m = compiled_re.match(self.last_command_output, self.last_command_pos)
         if m is not None:
             self.last_command_pos = m.end()
-            self.last_command_output = self.last_command
         else:
             self.expect_fail(regex)
         return m.groupdict()
