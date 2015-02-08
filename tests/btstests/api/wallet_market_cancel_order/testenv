@@ -12,4 +12,5 @@ with _btstest.ClientProcess(name="alice") as p_alice:
     rpc_client.wait_for_rpc()
     # active_client = "alice"
 
-run_testdir(my_path)
+    run_testdir(my_path)
+
