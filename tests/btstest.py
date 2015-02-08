@@ -37,7 +37,7 @@ class RPCClient(object):
         self.rpc_url = "http://{host}:{port}/rpc".format(**credentials)
         self.password_mgr.add_password(None, self.rpc_url, credentials["rpc_user"], credentials["rpc_password"])
 
-        self.basic_auth_handler = urllib.request.HTTPBasicAuthHandler(password_mgr)
+        self.basic_auth_handler = urllib.request.HTTPBasicAuthHandler(self.password_mgr)
 
         # create "opener" (OpenerDirector instance)
         self.url_opener = urllib.request.build_opener(handler)
