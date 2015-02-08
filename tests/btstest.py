@@ -195,6 +195,7 @@ class ClientProcess(object):
     def start(self):
         # execute process object and wait for RPC to become available
         if self.process_object is not None:
+            # TODO: exception type
             raise RuntimeError("start() called multiple times")
 
         data_dir = os.path.abspath(os.path.join(self.testdir, self.name))
@@ -204,28 +205,22 @@ class ClientProcess(object):
             os.makedirs(data_dir)
 
         if callable(self.p2p_port):
-            p2p_port = self.p2p_port()
-        else:
-            p2p_port = self.p2p_port
+            self.p2p_port = self.p2p_port()
 
         if callable(self.rpc_port):
-            rpc_port = self.rpc_port()
-        else:
-            rpc_port = self.rpc_port
+            self.rpc_port = self.rpc_port()
 
         if callable(self.http_port):
-            http_port = self.http_port()
-        else:
-            http_port = self.http_port
+            self.http_port = self.http_port()
 
         genesis_config = os.path.abspath(self.genesis_config)
 
         args = [
-            "--p2p-port", str(p2p_port),
+            "--p2p-port", str(self.p2p_port),
             "--rpcuser", self.username,
             "--rpcpassword", self.password,
-            "--rpcport", str(rpc_port),
-            "--httpport", str(http_port),
+            "--rpcport", str(self.rpc_port),
+            "--httpport", str(self.http_port),
             "--disable-default-peers",
             "--disable-peer-advertising",
             "--min-delegate-connection-count", "0",
@@ -251,7 +246,7 @@ class ClientProcess(object):
 
         self.rpc_client = RPCClient(dict(
             host="127.0.0.1",
-            port=http_port,
+            port=self.http_port,
             rpc_user = self.username,
             rpc_password = self.password,
             ))
@@ -458,6 +453,7 @@ class Test(object):
         if cmd[0] == "!client":
             self.context["active_client"] = cmd[1]
             return
+        # TODO: exception type
         raise RuntimeError("unknown metacommand ", cmd)
 
     def execute_cmd(self, cmd):
