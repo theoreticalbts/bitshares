@@ -435,7 +435,7 @@ class Test(object):
             if begin_tag > end_tag:
                 raise ParseError("mismatched tag ('}$' without beginning '${')"+error_file_info)
             expr = line[begin_tag+2:end_tag]
-            yield self.interpret_expr(expr)
+            self.interpret_expr(expr)
             start_pos = end_tag+2
         return
 
