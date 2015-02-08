@@ -81,7 +81,7 @@ class RPCClient(object):
 
         while True:
             try:
-                self.rpc_client("get_info")
+                self("get_info")
             except Exception as e:
                 # TODO: exception type
                 print("can't connect:")
