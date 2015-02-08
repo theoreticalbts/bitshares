@@ -10,6 +10,7 @@ import decimal
 import json
 import os
 import re
+import shutil
 import socket
 import subprocess
 import sys
@@ -244,8 +245,9 @@ class ClientProcess(object):
         data_dir = os.path.abspath(os.path.join(self.testdir, self.name))
         if not os.path.exists(self.testdir):
             os.makedirs(self.testdir)
-        if not os.path.exists(data_dir):
-            os.makedirs(data_dir)
+        if os.path.exists(data_dir):
+            shutil.rmtree(data_dir)
+        os.makedirs(data_dir)
 
         if callable(self.p2p_port):
             self.p2p_port = self.p2p_port()
