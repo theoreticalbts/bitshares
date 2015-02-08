@@ -465,12 +465,12 @@ class Test(object):
                     self.execute_cmd(line[p+4:])
         return
 
-    def run_testdir(self, testdir=None):
-        filenames = sorted(os.listdir(d))
+    def run_testdir(self, testdir):
+        filenames = sorted(os.listdir(testdir))
         for f in filenames:
             if not f.endswith(".btstest"):
                 continue
-            test.parse_script(os.path.join(d, f))
+            test.parse_script(os.path.join(testdir, f))
         return
 
     def register_client(self, client=None):
