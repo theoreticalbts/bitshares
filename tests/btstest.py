@@ -61,6 +61,9 @@ class RPCClient(object):
         self.next_request_id = result+1
         return result
 
+    def __call__(self, method, *args):
+        return self.call(method, args)
+
 class PortAssigner(object):
     def __init__(self, min_port=30000, max_port=40000):
         self.min_port = min_port
