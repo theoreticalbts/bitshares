@@ -57,6 +57,7 @@ class RPCClient(object):
         response = self.url_opener.open(req)
         response_content = response.read().decode("UTF-8")
         d = json.loads(response_content, parse_float=decimal.Decimal)
+        print("result:", d)
         result = d["result"]
         print("result:", result)
         return result
