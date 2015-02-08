@@ -53,7 +53,7 @@ class RPCClient(object):
         post_data = json.dumps(o).encode("UTF-8")
         req = urllib.request.Request(self.rpc_url, post_data)
         response = self.url_opener.open(req)
-        response_content = response.read()
+        response_content = response.read().decode("UTF-8")
         d = json.loads(response_content, parse_float=decimal.Decimal)
         return d["result"]
 
