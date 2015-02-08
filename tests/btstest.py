@@ -114,7 +114,7 @@ class LinuxPortAssigner(PortAssigner):
 
 class ClientProcess(object):
 
-    default_client_exe = os.path.join(os.path.dirname(__file__), "..", "programs", "client", "bitsharestestnet_client")
+    default_client_exe = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "programs", "client", "bitsharestestnet_client"))
     default_rpc_port = LinuxPortAssigner()
     default_http_port = default_rpc_port
     default_p2p_port = default_rpc_port
