@@ -179,6 +179,9 @@ class ClientProcess(object):
 
         self.process_object = None
 
+        self.stdout_file = None
+        self.stderr_file = None
+
         return
 
     def __enter__(self):
@@ -235,10 +238,13 @@ class ClientProcess(object):
 
         print("args: ", args)
 
+        self.stdout_file = open(os.path.join(data_dir, "stdout.txt"), "wb")
+        self.stderr_file = open(os.path.join(data_dir, "stderr.txt"), "wb")
+
         self.process_object = subprocess.Popen(
             [self.client_exe]+args,
-            #stdout=subprocess.DEVNULL,
-            #stderr=subprocess.DEVNULL,
+            stdout=self.stdout_file,
+            stderr=self.stderr_file,
             stdin=subprocess.PIPE,
             cwd=data_dir,
             )
@@ -298,6 +304,13 @@ class ClientProcess(object):
             self.process_object.wait(timeout=10)
         except subprocess.TimeoutExpired:
             self.process_object.kill()
+            self.process_object.wait(timeout=10)
+
+        if self.stdout_file is not None:
+            self.stdout_file.close()
+        if self.stderr_file is not None:
+            self.stderr_file.close()
+
         return
 
 class TestClient(object):
