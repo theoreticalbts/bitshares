@@ -40,7 +40,7 @@ class RPCClient(object):
         self.basic_auth_handler = urllib.request.HTTPBasicAuthHandler(self.password_mgr)
 
         # create "opener" (OpenerDirector instance)
-        self.url_opener = urllib.request.build_opener(handler)
+        self.url_opener = urllib.request.build_opener(self.basic_auth_handler)
 
         self.next_request_id = 1
 
