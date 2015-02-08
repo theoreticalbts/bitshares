@@ -424,10 +424,11 @@ class Test(object):
         begin_tag = line.find("${")
         end_tag = line.find("}$")
         start_pos = 0
+        print("splitting line:", repr(line))
         while True:
             if begin_tag < 0:
                 if end_tag < 0:
-                    yield self.expect_str(line[start_pos:])
+                    self.expect_str(line[start_pos:])
                     break
                 raise ParseError("mismatched tag ('}$' without beginning '${')"+error_file_info)
             if end_tag < 0:
