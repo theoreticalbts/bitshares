@@ -1,8 +1,13 @@
 >>> !client alice
 >>> debug_start_simulated_time "20140620T144030.000000"
+OK
 >>> wallet_create default password
+OK
 >>> wallet_set_automatic_backups false
+false
 >>> debug_deterministic_private_keys 0 101 init true
+[
+${ expect_regex(r'  ("[a-zA-Z0-9]*"[,]?\n){101} }$]
 >>>
 default (unlocked) >>> wallet_account_create test
 "XTS6nLGSU7AJwvY8WmgQ6y2kmqhwyT6DWKo4bPvBohXnWZR4hUXZt"
