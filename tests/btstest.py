@@ -72,6 +72,41 @@ class RPCClient(object):
     def __call__(self, method, *args):
         return self.call(method, args)
 
+    def wait_for_rpc(self):
+        #
+        # retry connecting until we succeed or timeout is reached
+        #
+
+        retry_loop_start = time.time()
+
+        while True:
+            try:
+                self.rpc_client("get_info")
+            except Exception as e:
+                # TODO: exception type
+                print("can't connect:")
+                print(e)
+                now = time.time()
+                dt = now - retry_loop_start
+                if dt < 10:
+                    time.sleep(0.25)
+                elif dt < 20:
+                    time.sleep(1)
+                elif dt < 60:
+                    time.sleep(10)
+                elif dt < 60*5:
+                    time.sleep(15)
+                else:
+                    print("timed out")
+                    # TODO : exception type
+                    raise RuntimeError()
+                continue
+            break
+
+        dt = time.time() - retry_loop_start
+        print("succeeded connecting to HTTP RPC after", dt, "seconds")
+        return
+
 class PortAssigner(object):
     def __init__(self, min_port=30000, max_port=40000):
         self.min_port = min_port
@@ -144,6 +179,7 @@ class ClientProcess(object):
         password=None,
         genesis_config=None,
         testdir=None,
+        rpc_client=None,
         ):
         self.name = name
 
@@ -183,6 +219,8 @@ class ClientProcess(object):
 
         self.stdout_file = None
         self.stderr_file = None
+
+        self.rpc_client = rpc_client
 
         return
 
@@ -245,47 +283,6 @@ class ClientProcess(object):
             stdin=subprocess.PIPE,
             cwd=data_dir,
             )
-
-        self.rpc_client = RPCClient(dict(
-            host="127.0.0.1",
-            port=self.http_port,
-            rpc_user = self.username,
-            rpc_password = self.password,
-            ))
-
-        #
-        # retry connecting until we succeed or timeout is reached
-        #
-
-        retry_loop_start = time.time()
-
-        while True:
-            try:
-                self.rpc_client("get_info")
-            except Exception as e:
-                # TODO: exception type
-                print("can't connect:")
-                print(e)
-                now = time.time()
-                dt = now - retry_loop_start
-                if dt < 10:
-                    time.sleep(0.25)
-                elif dt < 20:
-                    time.sleep(1)
-                elif dt < 60:
-                    time.sleep(10)
-                elif dt < 60*5:
-                    time.sleep(15)
-                else:
-                    print("timed out")
-                    # TODO : exception type
-                    raise RuntimeError()
-                continue
-            break
-
-        dt = time.time() - retry_loop_start
-        print("succeeded connecting to HTTP RPC after", dt, "seconds")
-
         return
 
     def stop(self):
