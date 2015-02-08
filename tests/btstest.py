@@ -461,6 +461,7 @@ class Test(object):
     def execute_cmd(self, cmd):
         if cmd.startswith("!"):
             self.parse_metacommand(cmd)
+            return
 
         client = self.get_active_client()
         client.execute_cmd(cmd)
