@@ -26,4 +26,3 @@ means verifying this invariant by iterating through micro entities (e.g. all bal
 be equal to the sum obtained, but might not be if there is a bug where some transactions, chain rewinding logic or whatever doesn't properly update the macro
 statistic).
 
-
