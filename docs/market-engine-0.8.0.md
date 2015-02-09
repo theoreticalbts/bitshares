@@ -1,4 +1,11 @@
 
+Document status
+---------------
+
+We are currently debating internally whether to move forward with the market engine refactoring described here.
+The purpose of this document is to make a detailed proposal for the refactoring and describe why it is necessary.
+The main argument against refactoring is a shortage of development resources.
+
 Relative orders
 ---------------
 
@@ -72,10 +79,15 @@ change depending on external chain state.
 - Cover orders have three modes of execution:  *called* (at the feed price when the margin call price has been reached), *expired* (at the feed price
 when the order is expired), and *inoperative* (when neither of the previous conditions is met).
 
-shorts:  mobile
+Index notes
+-----------
 
-_up : lower value matches first
-_down : higher value matches first
+This is some quick notes on what indexes are necessary to maintain.  This list of indexes is not final!
+
+    shorts:  mobile
+
+    _up : lower value matches first
+    _down : higher value matches first
 
     sessile short:  (limit_price_down, owner_up, rp_down, interest_down)
     mobile short:   (rp_down, interest_down, owner_up, limit_price_down)
@@ -89,10 +101,10 @@ _down : higher value matches first
     mobile r.a.:    (rel_price_up, owner_up)
 
 
-short needs indexed by limit price
-relative short needs to be indexed by feed_stop
-rb / ra needs to be indexed by limit price
-cover needs to be indexed by call price, exp. date
+    short needs indexed by limit price
+    relative short needs to be indexed by feed_stop
+    rb / ra needs to be indexed by limit price
+    cover needs to be indexed by call price, exp. date
 
 Orders and offers
 -----------------
