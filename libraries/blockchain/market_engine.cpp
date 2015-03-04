@@ -5,6 +5,11 @@
 
 namespace bts { namespace blockchain { namespace detail {
 
+#define MARKET_ENGINE_ITERATION_PROCESS_MARGIN_CALLS   0
+#define MARKET_ENGINE_ITERATION_PROCESS_EXPIRED_COVERS 1
+#define MARKET_ENGINE_ITERATION_PROCESS_ASK_ORDERS     2
+#define MARKET_ENGINE_ITERATION_NUM_ITERATIONS         3
+
   market_engine::market_engine( const pending_chain_state_ptr ps, const chain_database_impl& cdi )
   :_pending_state(ps),_db_impl(cdi)
   {
@@ -78,9 +83,16 @@ namespace bts { namespace blockchain { namespace detail {
              _short_at_limit_itr = decltype(_short_at_limit_itr)(_db_impl._short_limit_index.lower_bound( std::make_pair( *_feed_price, market_index_key( current_pair )) ));
 
           // prime the pump, to make sure that margin calls (asks) have a bid to check against.
+          // two loops:
+          // - outer loop has different set of orders included in Ask side
+          // - on first iteration, only margin calls are entered
+          // - on second iteration, expired cover positions are entered
+          // - on third iteration, normal Ask orders are entered
           
-          while( true )
+          for(_current_iteration=0;_current_iteration<MARKET_ITERATION_NUM_ITERATIONS;_current_iteration++)
           {
+           while( true )
+           {
             if( !_current_bid.valid() )
             {
                get_next_bid();
@@ -373,7 +385,8 @@ namespace bts { namespace blockchain { namespace detail {
                 base_asset->collected_fees += mtrx.fees_collected.amount;
             else if( mtrx.fees_collected.asset_id == quote_asset->id )
                 quote_asset->collected_fees += mtrx.fees_collected.amount;
-          } // while( next bid && next ask )
+           } // while( next bid && next ask )
+          } // _current_iteration
 
           // update any fees collected
           _pending_state->store_asset_record( *quote_asset );
