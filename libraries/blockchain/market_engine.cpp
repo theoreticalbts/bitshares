@@ -31,6 +31,7 @@ namespace bts { namespace blockchain { namespace detail {
 
           // The order book is sorted from low to high price. So to get the last item (highest bid),
           // we need to go to the first item in the next market class and then back up one
+          const price current_pair = price( 0, quote_id, base_id );
           const price next_pair = (base_id+1 == quote_id) ? price( 0, quote_id+1, 0 ) : price( 0, quote_id, base_id+1 );
           _bid_itr           = _db_impl._bid_db.lower_bound( market_index_key( next_pair ) );
           _ask_itr           = _db_impl._ask_db.lower_bound( market_index_key( price( 0, quote_id, base_id) ) );
@@ -42,7 +43,7 @@ namespace bts { namespace blockchain { namespace detail {
           edump( (_db_impl._shorts_at_feed) );
           edump( (_db_impl._short_limit_index) );
 
-          _collateral_expiration_itr  = _db_impl._collateral_expiration_index.lower_bound( { quote_id, time_point(), market_index_key( price(0,quote_id,base_id) ) } );
+          _collateral_expiration_itr  = _db_impl._collateral_expiration_index.lower_bound( { quote_id, time_point(), market_index_key( current_pair ) } );
 
           int last_orders_filled = -1;
           asset trading_volume(0, base_id);
@@ -70,9 +71,10 @@ namespace bts { namespace blockchain { namespace detail {
           }
 
           // TODO: enable this
+          // _short_at_limit_itr is a reverse_iterator, so it does not include any orders at _feed_price
+          // feed price is included in _short_at_feed_itr
           if( _feed_price )
-             _short_at_limit_itr = decltype(_short_at_limit_itr)(_db_impl._short_limit_index.lower_bound( std::make_pair( *_feed_price, market_index_key( next_pair )) ));
-
+             _short_at_limit_itr = decltype(_short_at_limit_itr)(_db_impl._short_limit_index.lower_bound( std::make_pair( *_feed_price, market_index_key( current_pair )) ));
 
           // prime the pump, to make sure that margin calls (asks) have a bid to check against.
           get_next_bid(); get_next_ask();
