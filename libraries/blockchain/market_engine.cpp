@@ -93,7 +93,7 @@ namespace bts { namespace blockchain { namespace detail {
           {
            while( true )
            {
-            if( !_current_bid.valid() )
+            if( (!_current_bid.valid()) || (_current_bid->get_balance() <= 0) )
             {
                get_next_bid();
                ilog("got next bid:");
@@ -104,7 +104,7 @@ namespace bts { namespace blockchain { namespace detail {
                   break;
                }
             }
-            if( !_current_ask.valid() )
+            if( (!_current_ask.valid()) || (_current_ask->get_balance() <= 0) )
             {
                get_next_ask();
                ilog("got next ask:");
