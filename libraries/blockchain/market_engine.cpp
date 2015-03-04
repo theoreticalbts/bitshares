@@ -51,6 +51,7 @@ namespace bts { namespace blockchain { namespace detail {
 
           if( !_ask_itr.valid() ) _ask_itr = _db_impl._ask_db.begin();
 
+          // TODO:  Does this really work if iterator is begin()?
           if( _bid_itr.valid() )   --_bid_itr;
           else _bid_itr = _db_impl._bid_db.last();
 
@@ -77,12 +78,32 @@ namespace bts { namespace blockchain { namespace detail {
              _short_at_limit_itr = decltype(_short_at_limit_itr)(_db_impl._short_limit_index.lower_bound( std::make_pair( *_feed_price, market_index_key( current_pair )) ));
 
           // prime the pump, to make sure that margin calls (asks) have a bid to check against.
-          get_next_bid(); get_next_ask();
-          ilog("initial bid/ask:");
-          idump( (_current_bid)(_current_ask) );
           
-          while( get_next_bid() && get_next_ask() )
+          while( true )
           {
+            if( !_current_bid.valid() )
+            {
+               get_next_bid();
+               ilog("got next bid:");
+               idump(_current_bid);
+               if( !_current_bid.valid() )
+               {
+                  ilog("market_engine terminating due to no more bids");
+                  break;
+               }
+            }
+            if( !_current_ask.valid() )
+            {
+               get_next_ask();
+               ilog("got next ask:");
+               idump(_current_ask);
+               if( !_current_ask.valid() )
+               {
+                  ilog("market_engine terminating due to no more asks");
+                  break;
+               }
+            }
+              
             ilog("top of loop.  bid/ask:");
             idump( (_current_bid)(_current_ask) );
 
