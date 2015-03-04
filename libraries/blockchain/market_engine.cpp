@@ -82,7 +82,6 @@ namespace bts { namespace blockchain { namespace detail {
           if( _feed_price )
              _short_at_limit_itr = decltype(_short_at_limit_itr)(_db_impl._short_limit_index.lower_bound( std::make_pair( *_feed_price, market_index_key( current_pair )) ));
 
-          // prime the pump, to make sure that margin calls (asks) have a bid to check against.
           // two loops:
           // - outer loop has different set of orders included in Ask side
           // - on first iteration, only margin calls are entered
@@ -91,6 +90,7 @@ namespace bts { namespace blockchain { namespace detail {
           
           for(_current_iteration=0;_current_iteration<MARKET_ITERATION_NUM_ITERATIONS;_current_iteration++)
           {
+           _current_ask.reset();
            while( true )
            {
             if( (!_current_bid.valid()) || (_current_bid->get_balance() <= 0) )
