@@ -91,30 +91,8 @@ namespace bts { namespace blockchain { namespace detail {
           for(_current_iteration=0;_current_iteration<MARKET_ITERATION_NUM_ITERATIONS;_current_iteration++)
           {
            _current_ask.reset();
-           while( true )
+           while( get_next_bid() && get_next_ask() )
            {
-            if( (!_current_bid.valid()) || (_current_bid->get_balance() <= 0) )
-            {
-               get_next_bid();
-               ilog("got next bid:");
-               idump(_current_bid);
-               if( !_current_bid.valid() )
-               {
-                  ilog("market_engine terminating due to no more bids");
-                  break;
-               }
-            }
-            if( (!_current_ask.valid()) || (_current_ask->get_balance() <= 0) )
-            {
-               get_next_ask();
-               ilog("got next ask:");
-               idump(_current_ask);
-               if( !_current_ask.valid() )
-               {
-                  ilog("market_engine terminating due to no more asks");
-                  break;
-               }
-            }
               
             ilog("top of loop.  bid/ask:");
             idump( (_current_bid)(_current_ask) );
