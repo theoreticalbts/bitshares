@@ -125,7 +125,7 @@ namespace bts { namespace blockchain { namespace detail {
                 ilog("current_bid->type == short_order");
                 FC_ASSERT( quote_asset->is_market_issued() );
                 // get_next_bid() shouldn't return shorts if there's no feed
-                FC_ASSERT( feed_price.valid() );
+                FC_ASSERT( _feed_price.valid() );
                 if( _current_bid->state.limit_price.valid() )
                     mtrx.bid_price = std::min( *_current_bid->state.limit_price, *_feed_price );
                 else
