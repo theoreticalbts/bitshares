@@ -87,7 +87,7 @@ namespace bts { namespace blockchain { namespace detail {
           // - on second iteration, expired cover positions are entered
           // - on third iteration, normal Ask orders are entered
           
-          for(_current_iteration=0;_current_iteration<MARKET_ITERATION_NUM_ITERATIONS;_current_iteration++)
+          for(_current_iteration=0;_current_iteration<MARKET_ENGINE_ITERATION_NUM_ITERATIONS;_current_iteration++)
           {
            _current_ask.reset();
            while( get_next_bid() && get_next_ask() )
@@ -222,7 +222,7 @@ namespace bts { namespace blockchain { namespace detail {
                 {
                     handle_liquidation( liquidation_price );
                     // skip future iterations
-                    _current_iteration = MARKET_ITERATION_NUM_ITERATIONS;
+                    _current_iteration = MARKET_ENGINE_ITERATION_NUM_ITERATIONS;
                     break;
                 }
             }
