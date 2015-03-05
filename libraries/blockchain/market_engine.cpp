@@ -62,10 +62,6 @@ namespace bts { namespace blockchain { namespace detail {
           if( _collateral_itr.valid() )   --_collateral_itr;
           else _collateral_itr = _db_impl._collateral_db.last();
 
-          if( _short_itr.valid() )   --_short_itr;
-          else _short_itr = _db_impl._short_db.last();
-
-
           // Market issued assets cannot match until the first time there is a median feed; assume feed price base id 0
           if( quote_asset->is_market_issued() && base_asset->id == 0 )
           {
