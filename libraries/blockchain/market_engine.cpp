@@ -788,9 +788,7 @@ namespace bts { namespace blockchain { namespace detail {
                   // shorts should already match and return above and are
                   // invalid here.
               default:
-                  FC_ASSERT( "Unknown Bid Type" );
-                  // TODO:  Warning or something goes here?
-                  ;
+                  FC_ASSERT( false, "Unknown Bid Type" );
           }
       }
 
@@ -920,8 +918,7 @@ namespace bts { namespace blockchain { namespace detail {
                   ++_ask_itr;
                   break;
               default:
-                  // TODO:  Warning or something goes here?
-                  ;
+                  FC_ASSERT( false, "Unknown Ask Type" );
           }
       }
 
