@@ -244,7 +244,7 @@ namespace bts { namespace blockchain { namespace detail {
                 mtrx.bid_paid       = mtrx.ask_received;
 
                 /** handle rounding errors */
-                if( usd_exchanged == short_quantity_usd ) // filled full short, consume all collateral
+                if( usd_exchanged == usd_for_sale ) // filled full short, consume all collateral
                    mtrx.short_collateral = _current_bid->get_balance();
                 else
                    mtrx.short_collateral = mtrx.bid_paid * collateral_rate; /** note rounding errors handled in pay_current_short */
