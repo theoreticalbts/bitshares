@@ -135,7 +135,7 @@ namespace bts { namespace blockchain { namespace detail {
                 ilog("current_ask->type == cover_order");
                 FC_ASSERT( quote_asset->is_market_issued() );
                 // get_next_ask() shouldn't return covers if there's no feed
-                FC_ASSERT( feed_price.valid() );
+                FC_ASSERT( _feed_price.valid() );
 
                 /**
                  *  Don't allow margin calls to be executed too far below
