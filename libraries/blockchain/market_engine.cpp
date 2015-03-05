@@ -885,6 +885,7 @@ namespace bts { namespace blockchain { namespace detail {
          ++_collateral_expiration_itr;
 
          // if we have a feed price and margin was called above then don't process it
+         // cover triggers either here or in get_next_ask_margin_call, not both
          if( !(_feed_price.valid() && cover_ask.get_price() > *_feed_price) )
          {
             _current_ask = cover_ask;
