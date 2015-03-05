@@ -131,7 +131,7 @@ namespace bts { namespace blockchain { namespace detail {
                 else
                     mtrx.bid_price = *_feed_price;
                 ilog("   bid: ${bid}    limit: ${limit}    feed: ${feed}",
-                     ("bid", mtrx.bid_price)("limit", *current_bid->state.limit_price)("feed", *_feed_price));
+                     ("bid", mtrx.bid_price)("limit", *_current_bid->state.limit_price)("feed", *_feed_price));
             }
 
             if( _current_ask->type == cover_order )
