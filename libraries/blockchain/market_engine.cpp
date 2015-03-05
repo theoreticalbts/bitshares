@@ -805,7 +805,23 @@ namespace bts { namespace blockchain { namespace detail {
 
       _current_ask.reset();
       ++_orders_filled;
+      
+      switch( _current_iteration )
+      {
+         case MARKET_ENGINE_ITERATION_PROCESS_MARGIN_CALLS:
+             return get_next_ask_margin_call();
+         case MARKET_ENGINE_ITERATION_PROCESS_EXPIRED_COVERS:
+             return get_next_ask_expired_cover();
+         case MARKET_ENGINE_ITERATION_PROCESS_ASK_ORDERS:
+             return get_next_ask_order();
+         default:
+      }
+      FC_ASSERT(false);
+    } FC_CAPTURE_AND_RETHROW()
+  }
 
+  bool market_engine::get_next_ask_margin_call()
+  {
       /**
       *  Margin calls take priority over all other ask orders
       */
@@ -835,7 +851,11 @@ namespace bts { namespace blockchain { namespace detail {
         _collateral_itr.reset();
         break;
       }
+      return false;
+  }
 
+  bool market_engine::get_next_ask_expired_cover()
+  {
       /**
        *  Process expired collateral positions.
        *  Expired margin positions take second priority based upon age
@@ -871,7 +891,11 @@ namespace bts { namespace blockchain { namespace detail {
             return true;
          } // else continue to next item
       }
+      return false;
+  }
 
+  bool market_engine::get_next_ask_order()
+  {
       /**
        *  Process asks.
        */

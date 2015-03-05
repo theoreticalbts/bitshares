@@ -31,6 +31,10 @@ namespace bts { namespace blockchain { namespace detail {
 
     bool get_next_bid();
     bool get_next_ask();
+    bool get_next_ask_margin_call();
+    bool get_next_ask_expired_cover();
+    bool get_next_ask_order();
+    
     asset get_current_cover_debt()const;
     uint32_t get_current_cover_age()const
     {
@@ -75,6 +79,7 @@ namespace bts { namespace blockchain { namespace detail {
     oprice                        _feed_price;
 
     int                           _orders_filled = 0;
+    int                           _current_iteration;
 
   public:
     vector<market_transaction>    _market_transactions;
@@ -82,11 +87,9 @@ namespace bts { namespace blockchain { namespace detail {
   private:
     bts::db::cached_level_map< market_index_key, order_record >::iterator         _bid_itr;
     bts::db::cached_level_map< market_index_key, order_record >::iterator         _ask_itr;
-    bts::db::cached_level_map< market_index_key, order_record >::iterator         _short_itr;
     std::set< market_index_key >::reverse_iterator                                _short_at_feed_itr;
     std::set< pair<price,market_index_key> >::reverse_iterator                    _short_at_limit_itr;
-    bts::db::cached_level_map< market_index_key, collateral_record >::iterator    _collateral_itr;
-    std::set< expiration_index >::iterator                   _collateral_expiration_itr;
+    bts::db::cached_level_map< market_index_key, collateral_record >::iterator    _called_collateral_itr;
   };
 
 } } } // end namespace bts::blockchain::detail
