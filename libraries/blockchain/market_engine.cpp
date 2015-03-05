@@ -802,8 +802,9 @@ namespace bts { namespace blockchain { namespace detail {
          case MARKET_ENGINE_ITERATION_PROCESS_ASK_ORDERS:
              return get_next_ask_order();
          default:
+             ;
       }
-      FC_ASSERT(false);
+      FC_ASSERT( false, "unknown market iteration" );
     } FC_CAPTURE_AND_RETHROW()
   }
 
