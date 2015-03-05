@@ -139,7 +139,14 @@ namespace bts { namespace blockchain { namespace detail {
             {
                 ilog("current_ask->type == cover_order");
                 FC_ASSERT( quote_asset->is_market_issued() );
-                if( !_feed_price.valid() ) { _current_ask.reset(); continue; }
+                // get_next_ask() shouldn't return covers if there's no feed
+                FC_ASSERT( feed_price.valid() );
+
+                if( mtrx.bid_price < minimum_cover_match_price() )
+                {
+                    ilog("terminating cover match iteration because bid doesn't meet minimum_cover_match_price");
+                    break;
+                }
 
                 /**
                 *  If call price is not reached AND cover has not expired, he lives to fight another day.
@@ -147,8 +154,7 @@ namespace bts { namespace blockchain { namespace detail {
                 *  the minimum ask, this could lead to an attack where someone
                 *  walks the whole book to steal the collateral.
                 */
-                if( (mtrx.ask_price < mtrx.bid_price && _current_collat_record.expiration > _pending_state->now()) ||
-                    mtrx.bid_price < minimum_ask() )
+                if( (mtrx.ask_price < mtrx.bid_price && _current_collat_record.expiration > _pending_state->now()) )
                 {
                    ilog("cover expired or not met");
                    _current_ask.reset(); continue;
