@@ -191,18 +191,27 @@ namespace bts { namespace blockchain { namespace detail {
             }
 
             price collateral_rate;
-            asset short_quantity_usd;
+            asset usd_for_sale;
             asset cover_collateral;
             asset max_usd_cover_can_afford;
             asset cover_debt;
             price liquidation_price;
             
-            if( _current_bid->type == short_order )
+            if( _current_bid->type == bid_order )
+            {
+                usd_for_sale = _current_bid->get_balance();
+            }
+            else if( _current_bid->type == short_order )
             {
                 collateral_rate                      = mtrx.bid_price;
                 collateral_rate.ratio               /= 2;
-                short_quantity_usd = _current_bid->get_balance() * collateral_rate;
+                usd_for_sale = _current_bid->get_balance() * collateral_rate;
             }
+            else
+            {
+                FC_ASSERT( false, "unknown bid type" );
+            }
+            
             if( _current_ask->type == cover_order )
             {
                 cover_collateral          = asset( *_current_ask->collateral, _base_id );
@@ -224,7 +233,7 @@ namespace bts { namespace blockchain { namespace detail {
                 ilog("cover matching short");
 
                 //Actual quote to purchase is the minimum of what's for sale, what can I possibly buy, and what I owe
-                const asset usd_exchanged = std::min( {short_quantity_usd, max_usd_cover_can_afford, cover_debt} );
+                const asset usd_exchanged = std::min( {usd_for_sale, max_usd_cover_can_afford, cover_debt} );
 
                 mtrx.ask_received   = usd_exchanged;
 
@@ -251,7 +260,6 @@ namespace bts { namespace blockchain { namespace detail {
             else if( _current_bid->type == bid_order && _current_ask->type == cover_order )
             {
                 ilog("cover matching bid");
-                const asset usd_for_sale              = _current_bid->get_balance();
                 asset usd_exchanged = std::min( {usd_for_sale, max_usd_cover_can_afford, cover_debt} );
 
                 mtrx.ask_received = usd_exchanged;
@@ -271,20 +279,15 @@ namespace bts { namespace blockchain { namespace detail {
             }
             else if( _current_ask->type == ask_order && _current_bid->type == short_order )
             {
-                const asset usd_exchanged      = std::min( short_quantity_usd, ask_quantity_usd );
+                const asset usd_exchanged      = std::min( usd_for_sale, ask_quantity_usd );
                 
                 ilog("short matching ask");
                 FC_ASSERT( _feed_price.valid() );
 
                 mtrx.ask_received   = usd_exchanged;
-                ilog("collateral_rate = ${collateral_rate}", ("collateral_rate",collateral_rate) );
-                ilog("ask_quantity_usd = ${ask_quantity_usd}", ("ask_quantity_usd",ask_quantity_usd) );
-                ilog("current_bid->get_balance() = ${b}", ("b",_current_bid->get_balance()) );
-                ilog("short_quantity_usd = ${short_quantity_usd}", ("short_quantity_usd",short_quantity_usd) );
-                ilog("usd_exchanged = ${usd_exchanged}", ("usd_exchanged",usd_exchanged) );
 
                 /** handle rounding errors */
-                if( usd_exchanged == short_quantity_usd )
+                if( usd_exchanged == usd_for_sale )
                 {
                    mtrx.ask_paid       = mtrx.ask_received * mtrx.ask_price;
                    mtrx.short_collateral = _current_bid->get_balance();
