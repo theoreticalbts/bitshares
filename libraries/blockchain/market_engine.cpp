@@ -174,10 +174,16 @@ namespace bts { namespace blockchain { namespace detail {
                     FC_ASSERT( false, "get_next_ask() returned inactive cover" );
                 }
             }
-            // get_next_ask() will return all covers first after checking expiration... which means
-            // if it is not a cover then we can stop matching orders as soon as there exists a spread
-            //// The ask price hasn't been reached
-            else if( mtrx.bid_price < mtrx.ask_price )
+            
+            //
+            // get_next_bid() always returns the best bid
+            // get_next_ask() always returns the best ask in the current iteration
+            //
+            // by "best" I mean that no other order can match if the best order does not match
+            // so we can terminate the current iteration as soon as the best orders don't match each other
+            // i.e. there is a spread
+            //
+            if( mtrx.bid_price < mtrx.ask_price )
             {
                ilog("market engine termination condition");
                ilog( "bid_price ${b} < ask_price ${a}; exit market loop", ("b",mtrx.bid_price)("a",mtrx.ask_price) );
