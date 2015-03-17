@@ -318,6 +318,22 @@
         ],
         "prerequisites" : ["wallet_unlocked"],
         "aliases" : []
+      },
+      {
+        "method_name": "debug_stop_at_block",
+        "description": "stop at given block number",
+        "return_type": "void",
+        "parameters" : [
+            {
+              "name" : "block_number",
+              "type" : "uint32_t",
+              "description" : "The block number to stop at"
+            }
+        ],
+        "is_const" : false,
+        "cached"  : false,
+        "prerequisites" : ["json_authenticated"],
+        "aliases" : ["stop_at_block"]
       }
     ]
 }
